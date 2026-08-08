@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Breadcrumbs from "./breadcrumbs";
 import { callApi } from "./api-client";
 
 export default function AccountPage({ email }: { email: string }) {
@@ -38,6 +39,7 @@ export default function AccountPage({ email }: { email: string }) {
 
   return (
     <>
+      <Breadcrumbs items={[{ label: "Account" }]} />
       <header className="page-header">
         <div>
           <p className="eyebrow">Account</p>

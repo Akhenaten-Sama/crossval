@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "@/components/app/api-client";
+import Breadcrumbs from "@/components/app/breadcrumbs";
 import { money } from "@/components/app/format";
 import { DocumentDetailSkeleton } from "@/components/app/skeletons";
 import Totals from "@/components/app/totals";
@@ -171,6 +172,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
 
   return (
     <>
+      <Breadcrumbs items={[{ label: "Documents", href: "/documents" }, { label: document?.title ?? "Document" }]} />
       <header className="page-header">
         <div>
           <p className="eyebrow">Document</p>

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "@/components/app/api-client";
+import Breadcrumbs from "@/components/app/breadcrumbs";
 import type { ApiDocument } from "@/components/app/types";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -33,6 +34,7 @@ export default function NewDocumentPage() {
 
   return (
     <>
+      <Breadcrumbs items={[{ label: "Documents", href: "/documents" }, { label: "New document" }]} />
       <header className="page-header">
         <div>
           <p className="eyebrow">New document</p>

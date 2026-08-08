@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { callApi } from "@/components/app/api-client";
+import Breadcrumbs from "@/components/app/breadcrumbs";
 import { Total } from "@/components/app/totals";
 import type { Summary } from "@/components/app/types";
 
@@ -26,6 +27,7 @@ export default function ReportPage() {
 
   return (
     <>
+      <Breadcrumbs items={[{ label: "Reports" }]} />
       <header className="page-header">
         <div>
           <p className="eyebrow">Reports</p>

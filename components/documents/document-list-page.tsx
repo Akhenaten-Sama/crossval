@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { callApi } from "@/components/app/api-client";
+import Breadcrumbs from "@/components/app/breadcrumbs";
 import { DocumentListSkeleton } from "@/components/app/skeletons";
 import type { ApiDocument } from "@/components/app/types";
 
@@ -51,6 +52,7 @@ export default function DocumentListPage() {
 
   return (
     <>
+      <Breadcrumbs items={[{ label: "Documents" }]} />
       <header className="page-header">
         <div>
           <p className="eyebrow">Documents</p>
