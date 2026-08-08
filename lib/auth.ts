@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { readDb } from "./store";
+import { findUserById } from "./repository";
 import type { UserRecord } from "./types";
 
 const cookieName = "pricing_session";
@@ -67,8 +67,7 @@ export async function getCurrentUser(): Promise<UserRecord | null> {
     return null;
   }
 
-  const db = await readDb();
-  const user = db.users.find((candidate) => candidate.id === session.userId);
+  const user = await findUserById(session.userId);
   if (!user) {
     return null;
   }

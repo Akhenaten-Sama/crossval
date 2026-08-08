@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { ApiError, ensureDraft, jsonError, serializeDocument } from "@/lib/api";
-import { updateDb } from "@/lib/store";
+import { ApiError, jsonError, serializeDocument } from "@/lib/api";
+import { finalizeDocument } from "@/lib/repository";
 import { getZodMessage } from "@/lib/validation";
 
 type Params = { params: Promise<{ id: string }> };
@@ -11,26 +11,7 @@ export async function POST(_request: NextRequest, context: Params) {
     const user = await requireUser();
     const { id } = await context.params;
 
-    const document = await updateDb((db) => {
-      const found = db.documents.find((candidate) => candidate.id === id && candidate.userId === user.id);
-      if (!found) {
-        throw new ApiError("document not found", 404);
-      }
-      ensureDraft(found);
-      for (const line of found.lineItems) {
-        if (line.quantity < 1) {
-          throw new ApiError("cannot finalize: every line quantity must be greater than or equal to 1");
-        }
-        if (line.unitPriceCents < 0) {
-          throw new ApiError("cannot finalize: line unit prices must be greater than or equal to 0");
-        }
-      }
-      const now = new Date().toISOString();
-      found.status = "finalized";
-      found.finalizedAt = now;
-      found.updatedAt = now;
-      return found;
-    });
+    const document = await finalizeDocument(id, user.id);
 
     return NextResponse.json({ document: serializeDocument(document) });
   } catch (error) {

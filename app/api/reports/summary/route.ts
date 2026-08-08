@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { formatMoney } from "@/lib/money";
 import { buildSummaryReport } from "@/lib/reports";
-import { readDb } from "@/lib/store";
+import { listDocumentsForReport } from "@/lib/repository";
 import { jsonError } from "@/lib/api";
 
 export async function GET(request: NextRequest) {
@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
       return jsonError("from must be before or equal to to");
     }
 
-    const db = await readDb();
-    const summary = buildSummaryReport(db.documents, user.id, from, to);
+    const documents = await listDocumentsForReport(user.id, from, to);
+    const summary = buildSummaryReport(documents, user.id, from, to);
 
     return NextResponse.json({
       summary: {

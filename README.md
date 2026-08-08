@@ -25,7 +25,22 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-The app stores local data at `data/db.json`. That file is ignored by git.
+The app stores local data at `data/db.json` when `MONGODB_URI` is not set. That file is ignored by git.
+
+For MongoDB Atlas, create `.env.local` from `.env.example` and set:
+
+```bash
+AUTH_SECRET="replace-with-a-long-random-secret"
+MONGODB_URI="mongodb+srv://..."
+MONGODB_DB="multi_rate_pricing"
+```
+
+Then run:
+
+```bash
+npm run db:migrate
+npm run dev
+```
 
 ## Scripts
 
@@ -34,6 +49,7 @@ npm test
 npm run lint
 npm run build
 npm audit --omit=dev
+npm run db:migrate
 ```
 
 ## Authentication
@@ -45,6 +61,45 @@ Unauthenticated users are restricted to `/auth`. The home page, document pages, 
 Every document query and mutation is scoped to the authenticated user. A user cannot read, edit, finalize, duplicate, delete, or report on another user's documents.
 
 Set `AUTH_SECRET` in production so session cookies are signed with an environment-specific secret.
+
+## Database
+
+MongoDB Atlas is the intended NoSQL database for this app. Until `MONGODB_URI` is configured, the repository layer falls back to local JSON storage so development and tests still work.
+
+Collections:
+
+- `users`
+- `documents`
+- `migrations`
+
+Models are defined in [lib/types.ts](/Users/olalekan/test-app/lib/types.ts) and collection/index metadata lives in [lib/models.ts](/Users/olalekan/test-app/lib/models.ts).
+
+The `documents` collection embeds line items inside each document:
+
+```ts
+{
+  id: string;
+  userId: string;
+  title: string;
+  customer: string;
+  issueDate: "YYYY-MM-DD";
+  status: "draft" | "finalized";
+  lineItems: LineItem[];
+}
+```
+
+Indexes created by migrations:
+
+- `users.email` unique
+- `documents.userId + documents.issueDate`
+- `documents.userId + documents.status`
+- `migrations.id` unique
+
+Run migrations after setting `MONGODB_URI`:
+
+```bash
+npm run db:migrate
+```
 
 ## Calculation Policy
 

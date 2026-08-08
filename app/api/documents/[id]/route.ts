@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { ApiError, ensureDraft, jsonError, serializeDocument } from "@/lib/api";
-import { updateDb } from "@/lib/store";
+import { ApiError, jsonError, serializeDocument } from "@/lib/api";
+import { deleteDraftDocument, findDocumentForUser, updateDocumentMetadata } from "@/lib/repository";
 import { documentPayloadSchema, getZodMessage } from "@/lib/validation";
 
 type Params = { params: Promise<{ id: string }> };
@@ -10,7 +10,7 @@ export async function GET(_request: NextRequest, context: Params) {
   try {
     const user = await requireUser();
     const { id } = await context.params;
-    const document = await updateDb((db) => db.documents.find((candidate) => candidate.id === id && candidate.userId === user.id));
+    const document = await findDocumentForUser(id, user.id);
     if (!document) {
       return jsonError("document not found", 404);
     }
@@ -26,18 +26,7 @@ export async function PUT(request: NextRequest, context: Params) {
     const { id } = await context.params;
     const payload = documentPayloadSchema.parse(await request.json());
 
-    const updated = await updateDb((db) => {
-      const document = db.documents.find((candidate) => candidate.id === id && candidate.userId === user.id);
-      if (!document) {
-        throw new ApiError("document not found", 404);
-      }
-      ensureDraft(document);
-      document.title = payload.title;
-      document.customer = payload.customer;
-      document.issueDate = payload.issueDate;
-      document.updatedAt = new Date().toISOString();
-      return document;
-    });
+    const updated = await updateDocumentMetadata(id, user.id, payload);
 
     return NextResponse.json({ document: serializeDocument(updated) });
   } catch (error) {
@@ -50,14 +39,7 @@ export async function DELETE(_request: NextRequest, context: Params) {
     const user = await requireUser();
     const { id } = await context.params;
 
-    await updateDb((db) => {
-      const index = db.documents.findIndex((candidate) => candidate.id === id && candidate.userId === user.id);
-      if (index === -1) {
-        throw new ApiError("document not found", 404);
-      }
-      ensureDraft(db.documents[index]);
-      db.documents.splice(index, 1);
-    });
+    await deleteDraftDocument(id, user.id);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

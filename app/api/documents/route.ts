@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { ApiError, jsonError, serializeDocument } from "@/lib/api";
-import { updateDb } from "@/lib/store";
+import { createDocument, listDocumentsByUser } from "@/lib/repository";
 import type { DocumentRecord, LineItem, LineItemInput } from "@/lib/types";
 import { documentPayloadSchema, getZodMessage, parseLineItemPayload } from "@/lib/validation";
 
 export async function GET() {
   try {
     const user = await requireUser();
-    const documents = await updateDb((db) => db.documents.filter((document) => document.userId === user.id).map(serializeDocument));
+    const documents = (await listDocumentsByUser(user.id)).map(serializeDocument);
     return NextResponse.json({ documents });
   } catch (error) {
     return routeError(error);
@@ -22,28 +22,25 @@ export async function POST(request: NextRequest) {
     const payload = documentPayloadSchema.parse(raw);
     const lineItems: LineItemInput[] = Array.isArray(raw.lineItems) ? raw.lineItems.map(parseLineItemPayload) : [];
 
-    const document = await updateDb((db) => {
-      const now = new Date().toISOString();
-      const created: DocumentRecord = {
+    const now = new Date().toISOString();
+    const created: DocumentRecord = {
+      id: crypto.randomUUID(),
+      userId: user.id,
+      title: payload.title,
+      customer: payload.customer,
+      issueDate: payload.issueDate,
+      status: "draft" as const,
+      createdAt: now,
+      updatedAt: now,
+      finalizedAt: null,
+      lineItems: lineItems.map<LineItem>((line) => ({
+        ...line,
         id: crypto.randomUUID(),
-        userId: user.id,
-        title: payload.title,
-        customer: payload.customer,
-        issueDate: payload.issueDate,
-        status: "draft" as const,
-        createdAt: now,
-        updatedAt: now,
-        finalizedAt: null,
-        lineItems: lineItems.map<LineItem>((line) => ({
-          ...line,
-          id: crypto.randomUUID(),
-          documentId: ""
-        }))
-      };
-      created.lineItems = created.lineItems.map((line) => ({ ...line, documentId: created.id }));
-      db.documents.push(created);
-      return created;
-    });
+        documentId: ""
+      }))
+    };
+    created.lineItems = created.lineItems.map((line) => ({ ...line, documentId: created.id }));
+    const document = await createDocument(created);
 
     return NextResponse.json({ document: serializeDocument(document) }, { status: 201 });
   } catch (error) {

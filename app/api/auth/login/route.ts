@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { setSessionCookie, verifyPassword } from "@/lib/auth";
-import { readDb } from "@/lib/store";
+import { findUserByEmail } from "@/lib/repository";
 import { getZodMessage } from "@/lib/validation";
 
 const schema = z.object({
@@ -12,8 +12,7 @@ const schema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const payload = schema.parse(await request.json());
-    const db = await readDb();
-    const user = db.users.find((candidate) => candidate.email === payload.email);
+    const user = await findUserByEmail(payload.email);
 
     if (!user || !(await verifyPassword(payload.password, user.passwordHash))) {
       return NextResponse.json({ error: "invalid email or password" }, { status: 401 });
