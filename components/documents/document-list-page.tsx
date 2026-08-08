@@ -84,8 +84,8 @@ export default function DocumentListPage() {
           {error ? <div className="message error">{error}</div> : null}
           {documents.length === 0 ? <EmptyState /> : null}
           {documents.length > 0 ? (
-            <div className="table-wrap scroll-table-wrap frozen-table-wrap">
-              <table className="data-table frozen-table">
+            <div className="table-wrap scroll-table-wrap frozen-table-wrap documents-table-wrap">
+              <table className="data-table frozen-table documents-table">
                 <thead>
                   <tr>
                     <th>Title</th>
@@ -93,7 +93,7 @@ export default function DocumentListPage() {
                     <th>Customer</th>
                     <th>Issue date</th>
                     <th>Status</th>
-                    <th>Total</th>
+                    <th className="total-column">Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -108,7 +108,7 @@ export default function DocumentListPage() {
                       <td>
                         <span className={`status ${document.status}`}>{document.status}</span>
                       </td>
-                      <td className="amount">{document.displayTotals.grandTotal}</td>
+                      <td className="amount total-column">{document.displayTotals.grandTotal}</td>
                     </tr>
                   ))}
                 </tbody>

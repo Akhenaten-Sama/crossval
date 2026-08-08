@@ -650,7 +650,9 @@ p {
 
 .frozen-table th:last-child,
 .frozen-table td:last-child {
+  box-sizing: border-box;
   min-width: var(--frozen-right-width);
+  overflow: hidden;
   position: sticky;
   right: 0;
   z-index: 2;
@@ -667,6 +669,25 @@ p {
 
 .line-items-table-wrap {
   --frozen-right-width: 232px;
+}
+
+.documents-table {
+  min-width: 1040px;
+}
+
+.documents-table-wrap {
+  --frozen-right-width: 176px;
+}
+
+.documents-table .total-column {
+  box-sizing: border-box;
+  max-width: var(--frozen-right-width);
+  min-width: var(--frozen-right-width);
+  overflow: hidden;
+  padding-right: 18px;
+  text-align: right;
+  white-space: nowrap;
+  width: var(--frozen-right-width);
 }
 
 .line-items-table .action-column {
