@@ -7,7 +7,7 @@ export default function AppShell({ children }: Readonly<{ children: React.ReactN
   const pathname = usePathname();
 
   if (pathname === "/auth") {
-    return <main className="auth-frame">{children}</main>;
+    return <>{children}</>;
   }
 
   return (
@@ -21,6 +21,7 @@ export default function AppShell({ children }: Readonly<{ children: React.ReactN
           <Link href="/documents">Documents</Link>
           <Link href="/documents/new">New Document</Link>
           <Link href="/reports">Reports</Link>
+          <Link href="/account">Account</Link>
         </nav>
       </aside>
       <div className="main-frame">{children}</div>

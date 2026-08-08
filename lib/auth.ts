@@ -85,6 +85,16 @@ export function setSessionCookie(response: NextResponse, userId: string): void {
   });
 }
 
+export function clearSessionCookie(response: NextResponse): void {
+  response.cookies.set(cookieName, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 0
+  });
+}
+
 async function pbkdf2(password: string, salt: string): Promise<string> {
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(password, salt, 120000, 32, "sha256", (error, derivedKey) => {

@@ -49,6 +49,25 @@ export async function createUser(user: UserRecord): Promise<UserRecord> {
   return user;
 }
 
+export async function updateUserPassword(userId: string, passwordHash: string): Promise<void> {
+  if (isMongoConfigured()) {
+    const { users } = await collections();
+    const result = await users.updateOne({ id: userId }, { $set: { passwordHash } });
+    if (result.matchedCount === 0) {
+      throw new ApiError("user not found", 404);
+    }
+    return;
+  }
+
+  const db = await readDb();
+  const user = db.users.find((candidate) => candidate.id === userId);
+  if (!user) {
+    throw new ApiError("user not found", 404);
+  }
+  user.passwordHash = passwordHash;
+  await writeDb(db);
+}
+
 export async function listDocumentsByUser(userId: string): Promise<DocumentRecord[]> {
   if (isMongoConfigured()) {
     const { documents } = await collections();

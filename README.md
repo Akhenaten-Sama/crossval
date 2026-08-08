@@ -54,7 +54,7 @@ npm run db:migrate
 
 ## Authentication
 
-Users sign up and log in with email and password at `/auth`. Passwords are hashed with PBKDF2 and sessions are stored in a signed HTTP-only cookie.
+Users sign up and log in with email and password at `/auth`. They can change their password at `/account`. Passwords are hashed with PBKDF2 and sessions are stored in a signed HTTP-only cookie.
 
 Unauthenticated users are restricted to `/auth`. The home page, document pages, and reports use server-side session checks and redirect to `/auth` before protected content renders.
 

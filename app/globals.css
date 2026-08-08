@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --background: #f4f6f8;
   --foreground: #101828;
@@ -489,7 +491,7 @@ p {
   }
 
   .nav-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .content-grid,
