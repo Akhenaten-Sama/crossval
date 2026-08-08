@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "@/components/app/api-client";
 import { money } from "@/components/app/format";
+import { DocumentDetailSkeleton } from "@/components/app/skeletons";
 import Totals from "@/components/app/totals";
 import type { ApiDocument } from "@/components/app/types";
 
@@ -164,6 +165,10 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     }
   }
 
+  if (loading) {
+    return <DocumentDetailSkeleton />;
+  }
+
   return (
     <>
       <header className="page-header">
@@ -187,8 +192,6 @@ export default function DocumentDetailPage({ id }: { id: string }) {
 
       {error ? <div className="message error">{error}</div> : null}
       {message ? <div className="message success">{message}</div> : null}
-      {loading ? <div className="panel">Loading document...</div> : null}
-
       {document ? (
         <div className="document-workspace">
           <section className="panel document-overview-panel">
@@ -254,7 +257,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                 Add line
               </button>
             </div>
-            <div className="table-wrap scroll-table-wrap">
+            <div className="table-wrap scroll-table-wrap frozen-table-wrap">
               <table className="data-table frozen-table line-items-table">
                 <thead>
                   <tr>

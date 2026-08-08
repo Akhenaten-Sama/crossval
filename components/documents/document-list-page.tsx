@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { callApi } from "@/components/app/api-client";
+import { DocumentListSkeleton } from "@/components/app/skeletons";
 import type { ApiDocument } from "@/components/app/types";
 
 export default function DocumentListPage() {
@@ -61,7 +62,10 @@ export default function DocumentListPage() {
         </Link>
       </header>
 
-      <section className="panel content-panel">
+      {loading ? (
+        <DocumentListSkeleton />
+      ) : (
+        <section className="panel content-panel">
           <div className="section-heading">
             <h2>All documents</h2>
             <button type="button" className="secondary" onClick={loadDocuments}>
@@ -69,10 +73,9 @@ export default function DocumentListPage() {
             </button>
           </div>
           {error ? <div className="message error">{error}</div> : null}
-          {loading ? <p className="muted">Loading documents...</p> : null}
-          {!loading && documents.length === 0 ? <EmptyState /> : null}
+          {documents.length === 0 ? <EmptyState /> : null}
           {documents.length > 0 ? (
-            <div className="table-wrap scroll-table-wrap">
+            <div className="table-wrap scroll-table-wrap frozen-table-wrap">
               <table className="data-table frozen-table">
                 <thead>
                   <tr>
@@ -101,7 +104,8 @@ export default function DocumentListPage() {
               </table>
             </div>
           ) : null}
-      </section>
+        </section>
+      )}
     </>
   );
 }
