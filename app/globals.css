@@ -241,6 +241,20 @@ p {
   color: white;
 }
 
+.sidebar-logout,
+.sidebar-logout:hover {
+  background: transparent;
+  border: 1px solid rgb(208 213 221 / 0.24);
+  color: #d0d5dd;
+  margin-top: auto;
+  width: 100%;
+}
+
+.sidebar-logout:hover {
+  background: #1f2937;
+  color: white;
+}
+
 .main-frame {
   margin: 0 auto;
   max-width: 1240px;
@@ -1033,6 +1047,11 @@ p {
   }
 
   .sidebar-action {
+    width: fit-content;
+  }
+
+  .sidebar-logout {
+    margin-top: 0;
     width: fit-content;
   }
 
