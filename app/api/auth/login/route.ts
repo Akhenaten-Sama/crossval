@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
     setSessionCookie(response, user.id);
     return response;
   } catch (error) {
-    return NextResponse.json({ error: getZodMessage(error) }, { status: 400 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: getZodMessage(error) }, { status: 400 });
+    }
+    console.error(error);
+    return NextResponse.json({ error: "Database connection failed" }, { status: 503 });
   }
 }

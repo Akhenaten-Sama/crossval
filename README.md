@@ -228,6 +228,8 @@ This repository is deployed on Vercel. Configure these production environment va
 - `MONGODB_URI`
 - `MONGODB_DB`
 
+MongoDB Atlas Network Access must allow Vercel serverless egress. For this take-home deployment, add `0.0.0.0/0` to the Atlas IP access list, or use a Vercel plan/network setup that provides static outbound IPs and allowlist those addresses.
+
 When deployed, add the live URL here and in the submission email:
 
 ```text
