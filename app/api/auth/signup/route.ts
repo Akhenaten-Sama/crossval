@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { ApiError } from "@/lib/api";
 import { hashPassword, setSessionCookie } from "@/lib/auth";
 import { updateDb } from "@/lib/store";
 import { getZodMessage } from "@/lib/validation";
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     const payload = schema.parse(await request.json());
     const user = await updateDb(async (db) => {
       if (db.users.some((candidate) => candidate.email === payload.email)) {
-        throw new Response("email is already registered", { status: 409 });
+        throw new ApiError("email is already registered", 409);
       }
 
       const now = new Date().toISOString();
@@ -32,8 +33,8 @@ export async function POST(request: NextRequest) {
     setSessionCookie(response, user.id);
     return response;
   } catch (error) {
-    if (error instanceof Response) {
-      return NextResponse.json({ error: await error.text() }, { status: error.status });
+    if (error instanceof ApiError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
     return NextResponse.json({ error: getZodMessage(error) }, { status: 400 });
   }

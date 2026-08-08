@@ -29,7 +29,7 @@ export async function PUT(request: NextRequest, context: Params) {
     const updated = await updateDb((db) => {
       const document = db.documents.find((candidate) => candidate.id === id && candidate.userId === user.id);
       if (!document) {
-        throw new Response("document not found", { status: 404 });
+        throw new ApiError("document not found", 404);
       }
       ensureDraft(document);
       document.title = payload.title;
@@ -53,7 +53,7 @@ export async function DELETE(_request: NextRequest, context: Params) {
     await updateDb((db) => {
       const index = db.documents.findIndex((candidate) => candidate.id === id && candidate.userId === user.id);
       if (index === -1) {
-        throw new Response("document not found", { status: 404 });
+        throw new ApiError("document not found", 404);
       }
       ensureDraft(db.documents[index]);
       db.documents.splice(index, 1);
