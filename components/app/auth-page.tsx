@@ -66,7 +66,7 @@ export default function AuthPage() {
               type="button"
               role="tab"
               aria-selected={mode === "login"}
-              className={`relative min-h-11 bg-transparent text-sm font-extrabold transition hover:bg-transparent ${
+              className={`auth-tab relative min-h-11 text-sm font-extrabold transition ${
                 mode === "login"
                   ? "text-teal-800 after:absolute after:inset-x-0 after:bottom-[-1px] after:h-0.5 after:rounded-full after:bg-teal-700"
                   : "text-slate-500 hover:text-slate-800"
@@ -79,7 +79,7 @@ export default function AuthPage() {
               type="button"
               role="tab"
               aria-selected={mode === "signup"}
-              className={`relative min-h-11 bg-transparent text-sm font-extrabold transition hover:bg-transparent ${
+              className={`auth-tab relative min-h-11 text-sm font-extrabold transition ${
                 mode === "signup"
                   ? "text-teal-800 after:absolute after:inset-x-0 after:bottom-[-1px] after:h-0.5 after:rounded-full after:bg-teal-700"
                   : "text-slate-500 hover:text-slate-800"

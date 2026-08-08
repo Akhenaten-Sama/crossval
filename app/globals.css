@@ -78,6 +78,16 @@ button:disabled {
   opacity: 0.55;
 }
 
+button.auth-tab,
+button.auth-tab:hover {
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+  min-height: 44px;
+  padding: 0;
+  width: 100%;
+}
+
 input,
 select {
   width: 100%;
