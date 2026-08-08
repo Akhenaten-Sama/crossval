@@ -66,9 +66,6 @@ export default function DocumentListPage() {
           <h1>Customer documents</h1>
           <p>Draft, finalize, duplicate, and review server-calculated totals.</p>
         </div>
-        <Link className="button-link" href="/documents/new">
-          New document
-        </Link>
       </header>
 
       {loading ? (
