@@ -17,7 +17,8 @@ export default function AccountPage({ email }: { email: string }) {
     event.preventDefault();
     setIsChangingPassword(true);
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     try {
       await callApi("/api/auth/change-password", {
         method: "POST",
@@ -26,7 +27,7 @@ export default function AccountPage({ email }: { email: string }) {
           newPassword: form.get("newPassword")
         })
       });
-      event.currentTarget.reset();
+      formElement.reset();
       showToast("Password updated.");
     } catch (apiError) {
       showToast(apiError instanceof Error ? apiError.message : "Could not update password", "error");

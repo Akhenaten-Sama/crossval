@@ -98,7 +98,8 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     }
     setError(null);
     setPendingAction("line");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const discountValue = form.get("discountValue") ? Number(form.get("discountValue")) : null;
     const discountType = discountValue === null ? "none" : discountBasis;
     try {
@@ -117,7 +118,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
         body: JSON.stringify(payload)
       });
       setDocument(body.document);
-      event.currentTarget.reset();
+      formElement.reset();
       closeLineModal();
       showToast(editingLine ? "Line item updated." : "Line item added.");
     } catch (apiError) {
