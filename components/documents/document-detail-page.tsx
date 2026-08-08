@@ -14,6 +14,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [discountBasis, setDiscountBasis] = useState<"percent" | "fixed">("percent");
 
   const totalsByLineId = useMemo(() => new Map(document?.totals.lines.map((line) => [line.id, line.totals]) ?? []), [document]);
 
@@ -74,6 +75,8 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     setError(null);
     setMessage(null);
     const form = new FormData(event.currentTarget);
+    const discountValue = form.get("discountValue") ? Number(form.get("discountValue")) : null;
+    const discountType = discountValue === null ? "none" : discountBasis;
     try {
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}/line-items`, {
         method: "POST",
@@ -81,9 +84,9 @@ export default function DocumentDetailPage({ id }: { id: string }) {
           description: form.get("description"),
           quantity: Number(form.get("quantity")),
           unitPrice: Number(form.get("unitPrice")),
-          discountType: form.get("discountType"),
-          discountPercent: form.get("discountPercent") ? Number(form.get("discountPercent")) : null,
-          discountAmount: form.get("discountAmount") ? Number(form.get("discountAmount")) : null,
+          discountType,
+          discountPercent: discountType === "percent" ? discountValue : null,
+          discountAmount: discountType === "fixed" ? discountValue : null,
           taxPercent: form.get("taxPercent") ? Number(form.get("taxPercent")) : null
         })
       });
@@ -267,22 +270,38 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                   </label>
                 </div>
                 <div className="field-row four">
-                  <label>
-                    Discount type
-                    <select name="discountType" defaultValue="none">
-                      <option value="none">None</option>
-                      <option value="percent">Percent</option>
-                      <option value="fixed">Fixed</option>
-                    </select>
-                  </label>
-                  <label>
-                    Discount %
-                    <input name="discountPercent" type="number" min="0" max="100" step="0.01" />
-                  </label>
-                  <label>
-                    Discount $
-                    <input name="discountAmount" type="number" min="0" step="0.01" />
-                  </label>
+                  <div className="discount-control">
+                    <label htmlFor="discountValue">Discount</label>
+                    <div className="discount-input-row">
+                      <input
+                        id="discountValue"
+                        name="discountValue"
+                        type="number"
+                        min="0"
+                        max={discountBasis === "percent" ? "100" : undefined}
+                        step="0.01"
+                        placeholder={discountBasis === "percent" ? "10" : "20.00"}
+                      />
+                      <div className="basis-toggle" aria-label="Discount basis">
+                        <button
+                          type="button"
+                          className={discountBasis === "percent" ? "active" : undefined}
+                          onClick={() => setDiscountBasis("percent")}
+                          aria-pressed={discountBasis === "percent"}
+                        >
+                          %
+                        </button>
+                        <button
+                          type="button"
+                          className={discountBasis === "fixed" ? "active" : undefined}
+                          onClick={() => setDiscountBasis("fixed")}
+                          aria-pressed={discountBasis === "fixed"}
+                        >
+                          $
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <button type="submit">Add line</button>
                 </div>
               </form>

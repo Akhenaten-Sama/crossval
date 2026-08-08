@@ -491,6 +491,46 @@ p {
   padding: 12px;
 }
 
+.discount-control {
+  display: grid;
+  gap: 6px;
+}
+
+.discount-input-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.basis-toggle {
+  align-items: center;
+  background: #eef2f6;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: inline-grid;
+  gap: 4px;
+  grid-template-columns: 34px 34px;
+  min-height: 38px;
+  padding: 3px;
+}
+
+.basis-toggle button,
+.basis-toggle button:hover {
+  background: transparent;
+  border-radius: 4px;
+  color: var(--muted);
+  min-height: 30px;
+  padding: 0;
+  width: 34px;
+}
+
+.basis-toggle button.active,
+.basis-toggle button.active:hover {
+  background: white;
+  color: var(--accent-dark);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.12);
+}
+
 @media (max-width: 980px) {
   .app-frame {
     grid-template-columns: 1fr;
