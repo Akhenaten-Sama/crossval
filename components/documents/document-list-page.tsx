@@ -72,8 +72,8 @@ export default function DocumentListPage() {
           {loading ? <p className="muted">Loading documents...</p> : null}
           {!loading && documents.length === 0 ? <EmptyState /> : null}
           {documents.length > 0 ? (
-            <div className="table-wrap">
-              <table className="data-table">
+            <div className="table-wrap scroll-table-wrap">
+              <table className="data-table frozen-table">
                 <thead>
                   <tr>
                     <th>Title</th>

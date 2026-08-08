@@ -8,6 +8,8 @@ import { money } from "@/components/app/format";
 import Totals from "@/components/app/totals";
 import type { ApiDocument } from "@/components/app/types";
 
+type LineItem = ApiDocument["lineItems"][number];
+
 export default function DocumentDetailPage({ id }: { id: string }) {
   const router = useRouter();
   const [document, setDocument] = useState<ApiDocument | null>(null);
@@ -15,6 +17,8 @@ export default function DocumentDetailPage({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [discountBasis, setDiscountBasis] = useState<"percent" | "fixed">("percent");
+  const [editingLine, setEditingLine] = useState<LineItem | null>(null);
+  const [isLineModalOpen, setIsLineModalOpen] = useState(false);
 
   const totalsByLineId = useMemo(() => new Map(document?.totals.lines.map((line) => [line.id, line.totals]) ?? []), [document]);
 
@@ -67,7 +71,20 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     }
   }
 
-  async function addLineItem(event: FormEvent<HTMLFormElement>) {
+  function openLineModal(line?: LineItem) {
+    setEditingLine(line ?? null);
+    setDiscountBasis(line?.discount?.type === "fixed" ? "fixed" : "percent");
+    setIsLineModalOpen(true);
+    setError(null);
+    setMessage(null);
+  }
+
+  function closeLineModal() {
+    setIsLineModalOpen(false);
+    setEditingLine(null);
+  }
+
+  async function submitLineItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!document) {
       return;
@@ -78,23 +95,26 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     const discountValue = form.get("discountValue") ? Number(form.get("discountValue")) : null;
     const discountType = discountValue === null ? "none" : discountBasis;
     try {
+      const payload = {
+        lineItemId: editingLine?.id,
+        description: form.get("description"),
+        quantity: Number(form.get("quantity")),
+        unitPrice: Number(form.get("unitPrice")),
+        discountType,
+        discountPercent: discountType === "percent" ? discountValue : null,
+        discountAmount: discountType === "fixed" ? discountValue : null,
+        taxPercent: form.get("taxPercent") ? Number(form.get("taxPercent")) : null
+      };
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}/line-items`, {
-        method: "POST",
-        body: JSON.stringify({
-          description: form.get("description"),
-          quantity: Number(form.get("quantity")),
-          unitPrice: Number(form.get("unitPrice")),
-          discountType,
-          discountPercent: discountType === "percent" ? discountValue : null,
-          discountAmount: discountType === "fixed" ? discountValue : null,
-          taxPercent: form.get("taxPercent") ? Number(form.get("taxPercent")) : null
-        })
+        method: editingLine ? "PUT" : "POST",
+        body: JSON.stringify(payload)
       });
       setDocument(body.document);
       event.currentTarget.reset();
-      setMessage("Line item added.");
+      closeLineModal();
+      setMessage(editingLine ? "Line item updated." : "Line item added.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not add line item");
+      setError(apiError instanceof Error ? apiError.message : "Could not save line item");
     }
   }
 
@@ -204,11 +224,16 @@ export default function DocumentDetailPage({ id }: { id: string }) {
 
           <section className="panel content-panel">
             <div className="section-heading">
-              <h2>Line items</h2>
-              <span className="muted">{document.lineItems.length} lines</span>
+              <div>
+                <h2>Line items</h2>
+                <span className="muted">{document.lineItems.length} lines</span>
+              </div>
+              <button type="button" onClick={() => openLineModal()} disabled={document.status === "finalized"}>
+                Add line
+              </button>
             </div>
-            <div className="table-wrap">
-              <table className="data-table">
+            <div className="table-wrap scroll-table-wrap">
+              <table className="data-table frozen-table line-items-table">
                 <thead>
                   <tr>
                     <th>Description</th>
@@ -217,7 +242,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                     <th>Discount</th>
                     <th>Tax</th>
                     <th>Total</th>
-                    <th></th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -232,9 +257,14 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                         <td>{totals ? money(totals.taxCents) : "$0.00"}</td>
                         <td className="amount">{totals ? money(totals.totalCents) : "$0.00"}</td>
                         <td>
-                          <button type="button" className="danger compact" disabled={document.status === "finalized"} onClick={() => removeLineItem(line.id)}>
-                            Remove
-                          </button>
+                          <div className="table-actions">
+                            <button type="button" className="secondary compact" disabled={document.status === "finalized"} onClick={() => openLineModal(line)}>
+                              Edit
+                            </button>
+                            <button type="button" className="danger compact" disabled={document.status === "finalized"} onClick={() => removeLineItem(line.id)}>
+                              Remove
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -248,69 +278,107 @@ export default function DocumentDetailPage({ id }: { id: string }) {
               </table>
             </div>
 
-            {document.status === "draft" ? (
-              <form className="line-form" onSubmit={addLineItem}>
-                <h3>Add line item</h3>
-                <div className="field-row four">
-                  <label>
-                    Description
-                    <input name="description" required placeholder="Widget A" />
-                  </label>
-                  <label>
-                    Quantity
-                    <input name="quantity" type="number" min="1" step="1" required defaultValue="1" />
-                  </label>
-                  <label>
-                    Unit price
-                    <input name="unitPrice" type="number" min="0" step="0.01" required placeholder="100.00" />
-                  </label>
-                  <label>
-                    Tax %
-                    <input name="taxPercent" type="number" min="0" max="100" step="0.01" placeholder="5" />
-                  </label>
-                </div>
-                <div className="field-row four">
-                  <div className="discount-control">
-                    <label htmlFor="discountValue">Discount</label>
-                    <div className="discount-input-row">
-                      <input
-                        id="discountValue"
-                        name="discountValue"
-                        type="number"
-                        min="0"
-                        max={discountBasis === "percent" ? "100" : undefined}
-                        step="0.01"
-                        placeholder={discountBasis === "percent" ? "10" : "20.00"}
-                      />
-                      <div className="basis-toggle" aria-label="Discount basis">
-                        <button
-                          type="button"
-                          className={discountBasis === "percent" ? "active" : undefined}
-                          onClick={() => setDiscountBasis("percent")}
-                          aria-pressed={discountBasis === "percent"}
-                        >
-                          %
-                        </button>
-                        <button
-                          type="button"
-                          className={discountBasis === "fixed" ? "active" : undefined}
-                          onClick={() => setDiscountBasis("fixed")}
-                          aria-pressed={discountBasis === "fixed"}
-                        >
-                          $
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <button type="submit">Add line</button>
-                </div>
-              </form>
-            ) : (
+            {document.status === "finalized" ? (
               <div className="read-only-note">Finalized documents are read-only. Duplicate this document to make a new draft.</div>
-            )}
+            ) : null}
           </section>
         </div>
       ) : null}
+
+      {document && isLineModalOpen ? (
+        <LineItemModal
+          key={editingLine?.id ?? "new-line"}
+          discountBasis={discountBasis}
+          line={editingLine}
+          onBasisChange={setDiscountBasis}
+          onClose={closeLineModal}
+          onSubmit={submitLineItem}
+        />
+      ) : null}
     </>
+  );
+}
+
+function LineItemModal({
+  discountBasis,
+  line,
+  onBasisChange,
+  onClose,
+  onSubmit
+}: {
+  discountBasis: "percent" | "fixed";
+  line: LineItem | null;
+  onBasisChange: (basis: "percent" | "fixed") => void;
+  onClose: () => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  const discountValue = line?.discount?.type === "percent" ? line.discount.value : line?.discount?.type === "fixed" ? line.discount.amountCents / 100 : "";
+
+  return (
+    <div className="modal-backdrop" role="presentation">
+      <section className="modal-panel" role="dialog" aria-modal="true" aria-labelledby="line-item-modal-title">
+        <div className="modal-header">
+          <div>
+            <p className="eyebrow">Line item</p>
+            <h2 id="line-item-modal-title">{line ? "Edit line item" : "Add line item"}</h2>
+          </div>
+          <button type="button" className="secondary compact" onClick={onClose}>
+            Close
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={onSubmit}>
+          <div className="field-row two">
+            <label>
+              Description
+              <input name="description" required placeholder="Widget A" defaultValue={line?.description ?? ""} autoFocus />
+            </label>
+            <label>
+              Quantity
+              <input name="quantity" type="number" min="1" step="1" required defaultValue={line?.quantity ?? 1} />
+            </label>
+          </div>
+          <div className="field-row two">
+            <label>
+              Unit price
+              <input name="unitPrice" type="number" min="0" step="0.01" required placeholder="100.00" defaultValue={line ? line.unitPriceCents / 100 : ""} />
+            </label>
+            <label>
+              Tax %
+              <input name="taxPercent" type="number" min="0" max="100" step="0.01" placeholder="5" defaultValue={line?.taxPercent ?? ""} />
+            </label>
+          </div>
+          <div className="discount-control">
+            <label htmlFor="discountValue">Discount</label>
+            <div className="discount-input-row">
+              <input
+                id="discountValue"
+                name="discountValue"
+                type="number"
+                min="0"
+                max={discountBasis === "percent" ? "100" : undefined}
+                step="0.01"
+                placeholder={discountBasis === "percent" ? "10" : "20.00"}
+                defaultValue={discountValue}
+              />
+              <div className="basis-toggle" aria-label="Discount basis">
+                <button type="button" className={discountBasis === "percent" ? "active" : undefined} onClick={() => onBasisChange("percent")} aria-pressed={discountBasis === "percent"}>
+                  %
+                </button>
+                <button type="button" className={discountBasis === "fixed" ? "active" : undefined} onClick={() => onBasisChange("fixed")} aria-pressed={discountBasis === "fixed"}>
+                  $
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit">{line ? "Save changes" : "Add line"}</button>
+          </div>
+        </form>
+      </section>
+    </div>
   );
 }
