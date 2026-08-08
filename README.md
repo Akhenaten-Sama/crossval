@@ -7,7 +7,9 @@ A small Next.js application for creating customer documents with line items, per
 - Next.js App Router
 - TypeScript
 - REST API routes
-- File-backed JSON persistence for local/demo use
+- MongoDB Atlas for NoSQL persistence
+- File-backed JSON persistence for local/demo fallback
+- Tailwind CSS and custom CSS
 - Zod validation
 - Vitest unit tests
 
@@ -220,12 +222,16 @@ npm test
 
 ## Deployment
 
-This repository is ready to deploy on any Next.js host that supports server routes and file-system writes. For production, replace the file-backed JSON store with a real database before relying on persisted data.
+This repository is deployed on Vercel. Configure these production environment variables for future deployments:
+
+- `AUTH_SECRET`
+- `MONGODB_URI`
+- `MONGODB_DB`
 
 When deployed, add the live URL here and in the submission email:
 
 ```text
-Live URL: pending deployment
+Live URL: https://test-app-six-xi.vercel.app
 ```
 
 ## Assumptions and Tradeoffs
@@ -238,9 +244,9 @@ Live URL: pending deployment
 
 ## Production Improvements
 
-- Move persistence to Postgres with migrations and transactions.
+- Add transaction handling for multi-step document writes.
 - Add integration tests for API route authentication and ownership boundaries.
 - Add Playwright coverage for core UI flows.
 - Add CSRF protection and request rate limiting.
-- Add proper logout, password reset, and email verification.
+- Add password reset and email verification.
 - Add deployment environment configuration and observability.
