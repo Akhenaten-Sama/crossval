@@ -190,18 +190,43 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       {loading ? <div className="panel">Loading document...</div> : null}
 
       {document ? (
-        <div className="detail-layout">
-          <section className="panel">
-            <div className="section-heading">
+        <div className="document-workspace">
+          <section className="panel document-overview-panel">
+            <div className="overview-header">
               <div>
                 <h2>Overview</h2>
-                <p className="muted">All totals are recalculated by the API after every mutation.</p>
+                <p className="muted">Server-calculated totals update after every document change.</p>
               </div>
               <span className={`status ${document.status}`}>{document.status}</span>
             </div>
             <Totals totals={document.displayTotals} />
+            <div className="document-facts">
+              <div>
+                <span>Customer</span>
+                <strong>{document.customer}</strong>
+              </div>
+              <div>
+                <span>Issue date</span>
+                <strong>{document.issueDate}</strong>
+              </div>
+              <div>
+                <span>Line items</span>
+                <strong>{document.lineItems.length}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel metadata-panel">
             <form className="form-grid" onSubmit={updateMetadata}>
-              <h3>Metadata</h3>
+              <div className="section-heading">
+                <div>
+                  <h2>Document details</h2>
+                  <p className="muted">Draft metadata remains editable until the document is finalized.</p>
+                </div>
+                <button type="submit" disabled={document.status === "finalized"}>
+                  Save details
+                </button>
+              </div>
               <div className="field-row">
                 <label>
                   Title
@@ -216,17 +241,14 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                   <input name="issueDate" type="date" required defaultValue={document.issueDate} disabled={document.status === "finalized"} />
                 </label>
               </div>
-              <button type="submit" disabled={document.status === "finalized"}>
-                Save details
-              </button>
             </form>
           </section>
 
-          <section className="panel content-panel">
+          <section className="panel content-panel line-items-panel">
             <div className="section-heading">
               <div>
                 <h2>Line items</h2>
-                <span className="muted">{document.lineItems.length} lines</span>
+                <p className="muted">Add, edit, and remove billable rows while this document is in draft.</p>
               </div>
               <button type="button" onClick={() => openLineModal()} disabled={document.status === "finalized"}>
                 Add line
