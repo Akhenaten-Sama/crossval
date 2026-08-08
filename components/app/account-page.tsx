@@ -63,7 +63,7 @@ export default function AccountPage({ email }: { email: string }) {
         </LoadingButton>
       </header>
 
-      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="account-layout grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <form className="panel form-grid content-panel" onSubmit={changePassword}>
           <h2>Change password</h2>
           <div className="field-row">

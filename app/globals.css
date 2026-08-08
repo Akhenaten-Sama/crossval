@@ -43,6 +43,19 @@ select {
 }
 
 button,
+.button-link,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 3px solid rgb(20 184 166 / 0.42);
+  outline-offset: 2px;
+}
+
+button,
 .button-link {
   align-items: center;
   border: 0;
@@ -118,6 +131,15 @@ button:disabled {
   padding: 13px 14px;
   text-align: left;
   white-space: normal;
+}
+
+.auth-page,
+.auth-grid,
+.auth-card-shell,
+.auth-form,
+.account-layout,
+.report-panel {
+  min-width: 0;
 }
 
 .toast:hover {
@@ -336,6 +358,7 @@ p {
   font-size: clamp(1.9rem, 3vw, 2.7rem);
   line-height: 1.05;
   margin: 0 0 9px;
+  overflow-wrap: anywhere;
 }
 
 .page-header p {
@@ -518,6 +541,7 @@ p {
 .section-heading h2,
 .section-heading p {
   margin: 0;
+  min-width: 0;
 }
 
 .form-grid,
@@ -645,7 +669,18 @@ p {
 }
 
 .data-table td:nth-child(2) {
+  min-width: 260px;
   white-space: normal;
+}
+
+.documents-table th:nth-child(2),
+.documents-table td:nth-child(2) {
+  min-width: 320px;
+}
+
+.line-items-table th:nth-child(2),
+.line-items-table td:nth-child(2) {
+  min-width: 300px;
 }
 
 .data-table th {
@@ -788,6 +823,10 @@ p {
   border: 1px dashed var(--border);
   border-radius: 8px;
   padding: 24px;
+}
+
+.empty-state .button-link {
+  width: fit-content;
 }
 
 .empty-state h3,
@@ -1112,6 +1151,22 @@ p {
     padding: 22px 18px 48px;
   }
 
+  .auth-page {
+    padding: 28px 18px;
+  }
+
+  .auth-grid {
+    min-height: calc(100vh - 56px);
+  }
+
+  .auth-card-shell {
+    border-radius: 12px;
+  }
+
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+
   .page-header {
     top: 108px;
   }
@@ -1167,10 +1222,38 @@ p {
   button,
   .button-link {
     min-width: 0;
+    text-align: center;
+    white-space: normal;
   }
 
   .main-frame {
     padding: 18px 12px 40px;
+  }
+
+  .auth-page {
+    padding: 18px 12px;
+  }
+
+  .auth-grid {
+    min-height: calc(100vh - 36px);
+  }
+
+  .auth-card-shell {
+    padding: 20px;
+  }
+
+  .auth-card-shell h2 {
+    font-size: 1.75rem;
+    line-height: 1.12;
+  }
+
+  .auth-mode-tabs {
+    margin-bottom: 18px;
+  }
+
+  .auth-input,
+  .auth-submit {
+    min-height: 46px;
   }
 
   .sidebar {
@@ -1251,6 +1334,14 @@ p {
     width: 100%;
   }
 
+  .empty-state {
+    padding: 18px;
+  }
+
+  .empty-state .button-link {
+    width: 100%;
+  }
+
   .field-row,
   .field-row.two,
   .field-row.four,
@@ -1306,6 +1397,16 @@ p {
 
   .line-items-table {
     min-width: 1040px;
+  }
+
+  .documents-table th:nth-child(2),
+  .documents-table td:nth-child(2) {
+    min-width: 280px;
+  }
+
+  .line-items-table th:nth-child(2),
+  .line-items-table td:nth-child(2) {
+    min-width: 260px;
   }
 
   .data-table th,
@@ -1385,6 +1486,10 @@ p {
     gap: 10px;
   }
 
+  .brand strong {
+    font-size: 0.95rem;
+  }
+
   .nav-list a {
     padding: 8px 10px;
   }
@@ -1397,6 +1502,14 @@ p {
     font-size: 1.45rem;
   }
 
+  .auth-card-shell {
+    padding: 16px;
+  }
+
+  .auth-card-shell h2 {
+    font-size: 1.55rem;
+  }
+
   .scroll-table-wrap {
     --frozen-left-width: 136px;
   }
@@ -1407,5 +1520,13 @@ p {
 
   .line-items-table-wrap {
     --frozen-right-width: 164px;
+  }
+
+  .documents-table {
+    min-width: 920px;
+  }
+
+  .line-items-table {
+    min-width: 980px;
   }
 }

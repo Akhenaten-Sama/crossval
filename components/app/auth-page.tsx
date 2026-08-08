@@ -31,10 +31,10 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_34%),linear-gradient(135deg,#f8fafc_0%,#eef2f7_45%,#e6f4f1_100%)] px-6 py-10 text-slate-950">
+    <div className="auth-page min-h-screen w-full bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_34%),linear-gradient(135deg,#f8fafc_0%,#eef2f7_45%,#e6f4f1_100%)] px-6 py-10 text-slate-950">
       <ToastViewport dismissToast={dismissToast} toasts={toasts} />
-      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="hidden lg:block">
+      <div className="auth-grid mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="auth-marketing hidden lg:block">
           <div className="mb-8 inline-flex rounded-full border border-teal-200 bg-white/70 px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
             Server-calculated pricing workspace
           </div>
@@ -51,7 +51,7 @@ export default function AuthPage() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-md rounded-2xl border border-white/70 bg-white/90 p-7 shadow-2xl shadow-slate-300/60 backdrop-blur">
+        <section className="auth-card-shell mx-auto w-full max-w-md rounded-2xl border border-white/70 bg-white/90 p-7 shadow-2xl shadow-slate-300/60 backdrop-blur">
           <div className="mb-7">
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-teal-700 text-base font-black text-white shadow-lg shadow-teal-700/20">
               MR
@@ -63,7 +63,7 @@ export default function AuthPage() {
             </p>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 border-b border-slate-200" role="tablist" aria-label="Authentication mode">
+          <div className="auth-mode-tabs mb-6 grid grid-cols-2 border-b border-slate-200" role="tablist" aria-label="Authentication mode">
             <button
               type="button"
               role="tab"
@@ -92,11 +92,11 @@ export default function AuthPage() {
             </button>
           </div>
 
-          <div className="grid gap-4">
+          <div className="auth-form grid gap-4">
             <label className="grid gap-2 text-sm font-bold text-slate-700">
               Email
               <input
-                className="h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className="auth-input h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
               />
@@ -104,7 +104,7 @@ export default function AuthPage() {
             <label className="grid gap-2 text-sm font-bold text-slate-700">
               Password
               <input
-                className="h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                className="auth-input h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -112,7 +112,7 @@ export default function AuthPage() {
             </label>
             <LoadingButton
               type="button"
-              className="mt-2 h-12 rounded-lg bg-teal-700 text-sm font-black text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60"
+              className="auth-submit mt-2 h-12 rounded-lg bg-teal-700 text-sm font-black text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60"
               onClick={submit}
               loading={loading}
             >
@@ -127,7 +127,7 @@ export default function AuthPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/70 bg-white/70 p-4 shadow-sm">
+    <div className="metric-card rounded-xl border border-white/70 bg-white/70 p-4 shadow-sm">
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{label}</p>
       <strong className="mt-2 block text-xl font-black text-slate-950">{value}</strong>
     </div>

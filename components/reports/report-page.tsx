@@ -45,7 +45,7 @@ export default function ReportPage() {
         </div>
       </header>
 
-      <section className="panel content-panel">
+      <section className="panel content-panel report-panel">
           <form className="report-form" onSubmit={runReport}>
             <label>
               From

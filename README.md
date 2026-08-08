@@ -220,6 +220,28 @@ Run:
 npm test
 ```
 
+## Mobile Compatibility Outline
+
+The UI is built around shared responsive layout contracts:
+
+- `AppShell` changes from a fixed desktop sidebar to a compact sticky top navigation below `980px`.
+- Page headers remain visible, then compress text/actions into a single-column layout below `720px`.
+- Forms use `.field-row` grids on desktop and collapse to one column on mobile.
+- Totals and document fact cards move from four columns to two columns on tablets and one column on phones.
+- Data tables keep frozen first/last columns, shrink frozen rails on phones, and preserve horizontal scrolling inside the table panel.
+- Line-item modals become phone-friendly bottom sheets below `720px`.
+- Toasts, empty states, skeletons, action groups, and auth/account/report surfaces have explicit narrow-screen rules.
+
+Mobile audit coverage:
+
+- `/auth`
+- `/`
+- `/documents`
+- `/documents/new`
+- `/documents/[id]`
+- `/reports`
+- `/account`
+
 ## Deployment
 
 This repository is deployed on Vercel. Configure these production environment variables for future deployments:
