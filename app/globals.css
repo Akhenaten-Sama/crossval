@@ -294,10 +294,15 @@ p {
 
 .page-header {
   align-items: start;
+  background: var(--background);
   display: flex;
   gap: 18px;
   justify-content: space-between;
   margin-bottom: 24px;
+  padding: 12px 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
 .page-header h1 {
