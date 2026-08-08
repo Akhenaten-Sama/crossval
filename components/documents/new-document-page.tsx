@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import AuthPanel from "@/components/app/auth-panel";
 import { callApi } from "@/components/app/api-client";
 import type { ApiDocument } from "@/components/app/types";
 
@@ -42,9 +41,7 @@ export default function NewDocumentPage() {
         </div>
       </header>
 
-      <div className="content-grid">
-        <AuthPanel />
-        <form className="panel form-grid content-panel" onSubmit={createDocument}>
+      <form className="panel form-grid content-panel" onSubmit={createDocument}>
           <h2>Document details</h2>
           {error ? <div className="message error">{error}</div> : null}
           <div className="field-row">
@@ -64,8 +61,7 @@ export default function NewDocumentPage() {
           <div className="actions">
             <button type="submit">Create draft</button>
           </div>
-        </form>
-      </div>
+      </form>
     </>
   );
 }

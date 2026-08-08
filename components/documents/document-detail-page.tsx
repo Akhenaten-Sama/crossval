@@ -4,7 +4,6 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "@/components/app/api-client";
-import AuthPanel from "@/components/app/auth-panel";
 import { money } from "@/components/app/format";
 import Totals from "@/components/app/totals";
 import type { ApiDocument } from "@/components/app/types";
@@ -17,19 +16,6 @@ export default function DocumentDetailPage({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
 
   const totalsByLineId = useMemo(() => new Map(document?.totals.lines.map((line) => [line.id, line.totals]) ?? []), [document]);
-
-  async function loadDocument() {
-    setLoading(true);
-    setError(null);
-    try {
-      const body = await callApi<{ document: ApiDocument }>(`/api/documents/${id}`);
-      setDocument(body.document);
-    } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not load document");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   useEffect(() => {
     let active = true;
@@ -304,8 +290,6 @@ export default function DocumentDetailPage({ id }: { id: string }) {
               <div className="read-only-note">Finalized documents are read-only. Duplicate this document to make a new draft.</div>
             )}
           </section>
-
-          <AuthPanel onAuthenticated={loadDocument} />
         </div>
       ) : null}
     </>

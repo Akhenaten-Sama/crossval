@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { requirePageUser } from "@/lib/page-auth";
 
-export default function Home() {
+export default async function Home() {
+  await requirePageUser();
+
   return (
     <>
       <header className="page-header home-header">

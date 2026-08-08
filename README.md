@@ -38,7 +38,9 @@ npm audit --omit=dev
 
 ## Authentication
 
-Users sign up and log in with email and password. Passwords are hashed with PBKDF2 and sessions are stored in a signed HTTP-only cookie.
+Users sign up and log in with email and password at `/auth`. Passwords are hashed with PBKDF2 and sessions are stored in a signed HTTP-only cookie.
+
+Unauthenticated users are restricted to `/auth`. The home page, document pages, and reports use server-side session checks and redirect to `/auth` before protected content renders.
 
 Every document query and mutation is scoped to the authenticated user. A user cannot read, edit, finalize, duplicate, delete, or report on another user's documents.
 

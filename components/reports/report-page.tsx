@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import AuthPanel from "@/components/app/auth-panel";
 import { callApi } from "@/components/app/api-client";
 import { Total } from "@/components/app/totals";
 import type { Summary } from "@/components/app/types";
@@ -35,9 +34,7 @@ export default function ReportPage() {
         </div>
       </header>
 
-      <div className="content-grid">
-        <AuthPanel />
-        <section className="panel content-panel">
+      <section className="panel content-panel">
           <form className="report-form" onSubmit={runReport}>
             <label>
               From
@@ -63,8 +60,7 @@ export default function ReportPage() {
               <p>Choose a date range and run the report after creating documents.</p>
             </div>
           )}
-        </section>
-      </div>
+      </section>
     </>
   );
 }

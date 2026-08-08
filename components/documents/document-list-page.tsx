@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import AuthPanel from "@/components/app/auth-panel";
 import { callApi } from "@/components/app/api-client";
 import type { ApiDocument } from "@/components/app/types";
 
@@ -62,9 +61,7 @@ export default function DocumentListPage() {
         </Link>
       </header>
 
-      <div className="content-grid">
-        <AuthPanel onAuthenticated={loadDocuments} />
-        <section className="panel content-panel">
+      <section className="panel content-panel">
           <div className="section-heading">
             <h2>All documents</h2>
             <button type="button" className="secondary" onClick={loadDocuments}>
@@ -104,8 +101,7 @@ export default function DocumentListPage() {
               </table>
             </div>
           ) : null}
-        </section>
-      </div>
+      </section>
     </>
   );
 }

@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function AppShell({ children }: Readonly<{ children: React.ReactNode }>) {
+  const pathname = usePathname();
+
+  if (pathname === "/auth") {
+    return <main className="auth-frame">{children}</main>;
+  }
+
   return (
     <div className="app-frame">
       <aside className="sidebar">

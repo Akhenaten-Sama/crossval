@@ -1,5 +1,8 @@
 import NewDocumentPage from "@/components/documents/new-document-page";
+import { requirePageUser } from "@/lib/page-auth";
 
-export default function NewDocumentRoute() {
+export default async function NewDocumentRoute() {
+  await requirePageUser();
+
   return <NewDocumentPage />;
 }

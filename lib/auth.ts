@@ -52,16 +52,25 @@ export function readSessionToken(token: string | undefined): { userId: string } 
 }
 
 export async function requireUser(): Promise<UserRecord> {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Response("Authentication required", { status: 401 });
+  }
+
+  return user;
+}
+
+export async function getCurrentUser(): Promise<UserRecord | null> {
   const cookieStore = await cookies();
   const session = readSessionToken(cookieStore.get(cookieName)?.value);
   if (!session) {
-    throw new Response("Authentication required", { status: 401 });
+    return null;
   }
 
   const db = await readDb();
   const user = db.users.find((candidate) => candidate.id === session.userId);
   if (!user) {
-    throw new Response("Authentication required", { status: 401 });
+    return null;
   }
 
   return user;

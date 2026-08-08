@@ -159,6 +159,50 @@ p {
   width: 100%;
 }
 
+.auth-frame {
+  align-items: center;
+  display: grid;
+  min-height: 100vh;
+  padding: 28px;
+}
+
+.auth-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 22px;
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 26px;
+  width: 100%;
+}
+
+.auth-card h1 {
+  font-size: 2rem;
+  line-height: 1.08;
+  margin: 0 0 10px;
+}
+
+.auth-card p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.segmented {
+  background: #eef2f6;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr 1fr;
+  padding: 5px;
+}
+
+.segmented button {
+  width: 100%;
+}
+
 .page-header {
   align-items: start;
   display: flex;
