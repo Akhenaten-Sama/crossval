@@ -18,10 +18,12 @@ export function jsonError(message: string, status = 400): NextResponse {
 
 export function serializeDocument(document: DocumentRecord) {
   const totals = calculateDocumentTotals(document);
+  const lineItems = document.lineItems.map((line) => ({ ...line, details: line.details ?? "" }));
 
   return {
     ...document,
     description: document.description ?? "",
+    lineItems,
     totals,
     displayTotals: {
       subtotal: formatMoney(totals.subtotalCents),

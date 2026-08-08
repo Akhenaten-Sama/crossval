@@ -8,6 +8,7 @@ export type ApiDocument = {
   lineItems: Array<{
     id: string;
     description: string;
+    details: string;
     quantity: number;
     unitPriceCents: number;
     discount: { type: "percent"; value: number } | { type: "fixed"; amountCents: number } | null;

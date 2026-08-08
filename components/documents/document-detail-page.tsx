@@ -106,6 +106,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       const payload = {
         lineItemId: editingLine?.id,
         description: form.get("description"),
+        details: form.get("details"),
         quantity: Number(form.get("quantity")),
         unitPrice: Number(form.get("unitPrice")),
         discountType,
@@ -284,6 +285,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
               <table className="data-table frozen-table line-items-table">
                 <thead>
                   <tr>
+                    <th>Item</th>
                     <th>Description</th>
                     <th>Qty</th>
                     <th>Unit</th>
@@ -299,6 +301,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                     return (
                       <tr key={line.id}>
                         <td>{line.description}</td>
+                        <td>{line.details || "—"}</td>
                         <td>{line.quantity}</td>
                         <td>{money(line.unitPriceCents)}</td>
                         <td>{totals ? money(totals.discountCents) : "$0.00"}</td>
@@ -319,7 +322,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                   })}
                   {document.lineItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7}>No line items yet.</td>
+                      <td colSpan={8}>No line items yet.</td>
                     </tr>
                   ) : null}
                 </tbody>
@@ -381,7 +384,7 @@ function LineItemModal({
         <form className="modal-form" onSubmit={onSubmit}>
           <div className="field-row two">
             <label>
-              Description
+              Item name
               <input name="description" required placeholder="Widget A" defaultValue={line?.description ?? ""} autoFocus />
             </label>
             <label>
@@ -389,6 +392,10 @@ function LineItemModal({
               <input name="quantity" type="number" min="1" step="1" required defaultValue={line?.quantity ?? 1} />
             </label>
           </div>
+          <label>
+            Description
+            <textarea name="details" maxLength={500} placeholder="Optional details about this item, scope, or service." defaultValue={line?.details ?? ""} />
+          </label>
           <div className="field-row two">
             <label>
               Unit price

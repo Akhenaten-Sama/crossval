@@ -7,6 +7,7 @@ export type Discount =
 
 export type LineItemInput = {
   description: string;
+  details: string;
   quantity: number;
   unitPriceCents: number;
   discount: Discount;

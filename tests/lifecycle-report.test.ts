@@ -45,6 +45,7 @@ function makeDocument(status: "draft" | "finalized", userId = "user_1", issueDat
         id: crypto.randomUUID(),
         documentId: "doc",
         description: "Line",
+        details: "",
         quantity: 1,
         unitPriceCents: subtotalCents,
         discount: discountCents ? { type: "fixed", amountCents: discountCents } : null,

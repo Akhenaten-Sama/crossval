@@ -68,7 +68,7 @@ describe("pricing calculations", () => {
 });
 
 function line(description: string, quantity: number, unitPriceCents: number, discount: LineItemInput["discount"], taxPercent: number | null): LineItemInput {
-  return { description, quantity, unitPriceCents, discount, taxPercent };
+  return { description, details: "", quantity, unitPriceCents, discount, taxPercent };
 }
 
 function documentWithLines(lines: LineItemInput[]): DocumentRecord {

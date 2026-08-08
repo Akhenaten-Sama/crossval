@@ -19,6 +19,7 @@ export function calculateLineTotals(line: LineItemInput): LineTotals {
 export function calculateDocumentTotals(document: Pick<DocumentRecord, "lineItems">): DocumentTotals {
   const lines = document.lineItems.map((line) => ({
     ...line,
+    details: line.details ?? "",
     totals: calculateLineTotals(line)
   }));
 

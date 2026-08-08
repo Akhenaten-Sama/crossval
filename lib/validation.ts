@@ -21,6 +21,7 @@ export const documentPayloadSchema = z.object({
 const rawLineItemSchema = z
   .object({
     description: z.string().trim().min(1, "description is required"),
+    details: z.string().trim().max(500, "line item description must be 500 characters or fewer").optional().default(""),
     quantity: z.number({ invalid_type_error: "quantity must be a number" }),
     unitPrice: z.number({ invalid_type_error: "unitPrice must be a number" }),
     discountType: z.enum(["none", "percent", "fixed"]).default("none"),
@@ -83,6 +84,7 @@ export function parseLineItemPayload(payload: unknown): LineItemInput {
 
   const line: LineItemInput = {
     description: value.description,
+    details: value.details,
     quantity: value.quantity,
     unitPriceCents,
     discount,

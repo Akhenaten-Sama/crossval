@@ -157,7 +157,7 @@ export async function deleteDraftDocument(id: string, userId: string): Promise<v
 
 export async function addLineItem(id: string, userId: string, payload: LineItemInput): Promise<DocumentRecord> {
   const document = await findMutableDocument(id, userId);
-  const line: LineItem = { ...payload, id: crypto.randomUUID(), documentId: document.id };
+  const line: LineItem = { ...payload, details: payload.details ?? "", id: crypto.randomUUID(), documentId: document.id };
   const updatedAt = new Date().toISOString();
 
   if (isMongoConfigured()) {
@@ -179,7 +179,7 @@ export async function updateLineItem(id: string, userId: string, lineItemId: str
     throw new ApiError("line item not found", 404);
   }
 
-  const line: LineItem = { ...payload, id: lineItemId, documentId: document.id };
+  const line: LineItem = { ...payload, details: payload.details ?? "", id: lineItemId, documentId: document.id };
   const updatedAt = new Date().toISOString();
 
   if (isMongoConfigured()) {
@@ -265,6 +265,7 @@ export async function duplicateDocument(id: string, userId: string): Promise<Doc
     finalizedAt: null,
     lineItems: source.lineItems.map((line) => ({
       ...line,
+      details: line.details ?? "",
       id: crypto.randomUUID(),
       documentId: ""
     }))

@@ -14,6 +14,7 @@ describe("line item validation", () => {
       })
     ).toEqual({
       description: "Service",
+      details: "",
       quantity: 2,
       unitPriceCents: 1999,
       discount: { type: "fixed", amountCents: 500 },
