@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { ApiError, jsonError, serializeDocument } from "@/lib/api";
 import { updateDb } from "@/lib/store";
+import type { DocumentRecord, LineItem, LineItemInput } from "@/lib/types";
 import { documentPayloadSchema, getZodMessage, parseLineItemPayload } from "@/lib/validation";
 
 export async function GET() {
@@ -19,11 +20,11 @@ export async function POST(request: NextRequest) {
     const user = await requireUser();
     const raw = await request.json();
     const payload = documentPayloadSchema.parse(raw);
-    const lineItems = Array.isArray(raw.lineItems) ? raw.lineItems.map(parseLineItemPayload) : [];
+    const lineItems: LineItemInput[] = Array.isArray(raw.lineItems) ? raw.lineItems.map(parseLineItemPayload) : [];
 
     const document = await updateDb((db) => {
       const now = new Date().toISOString();
-      const created = {
+      const created: DocumentRecord = {
         id: crypto.randomUUID(),
         userId: user.id,
         title: payload.title,
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
         createdAt: now,
         updatedAt: now,
         finalizedAt: null,
-        lineItems: lineItems.map((line) => ({
+        lineItems: lineItems.map<LineItem>((line) => ({
           ...line,
           id: crypto.randomUUID(),
           documentId: ""

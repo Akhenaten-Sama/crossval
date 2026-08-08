@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
-import { calculateDocumentTotals } from "@/lib/calculations";
 import { formatMoney } from "@/lib/money";
+import { buildSummaryReport } from "@/lib/reports";
 import { readDb } from "@/lib/store";
 import { jsonError } from "@/lib/api";
 
@@ -23,24 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     const db = await readDb();
-    const documents = db.documents.filter((document) => document.userId === user.id && document.issueDate >= from && document.issueDate <= to);
-    const summary = documents.reduce(
-      (acc, document) => {
-        const totals = calculateDocumentTotals(document);
-        return {
-          documentCount: acc.documentCount + 1,
-          grandTotalCents: acc.grandTotalCents + totals.grandTotalCents,
-          taxCents: acc.taxCents + totals.taxCents,
-          discountCents: acc.discountCents + totals.discountCents
-        };
-      },
-      {
-        documentCount: 0,
-        grandTotalCents: 0,
-        taxCents: 0,
-        discountCents: 0
-      }
-    );
+    const summary = buildSummaryReport(db.documents, user.id, from, to);
 
     return NextResponse.json({
       summary: {
