@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       id: crypto.randomUUID(),
       userId: user.id,
       title: payload.title,
+      description: payload.description,
       customer: payload.customer,
       issueDate: payload.issueDate,
       status: "draft" as const,

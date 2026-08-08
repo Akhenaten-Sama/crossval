@@ -3,7 +3,9 @@
 import { FormEvent, useState } from "react";
 import { callApi } from "@/components/app/api-client";
 import Breadcrumbs from "@/components/app/breadcrumbs";
+import LoadingButton from "@/components/app/loading-button";
 import { Total } from "@/components/app/totals";
+import { ToastViewport, useToasts } from "@/components/app/toasts";
 import type { Summary } from "@/components/app/types";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -13,20 +15,27 @@ export default function ReportPage() {
   const [to, setTo] = useState(today);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const { dismissToast, showToast, toasts } = useToasts();
 
   async function runReport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setIsRunning(true);
     try {
       const body = await callApi<{ summary: Summary }>(`/api/reports/summary?from=${from}&to=${to}`);
       setSummary(body.summary);
+      showToast("Report refreshed.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not run report");
+      showToast(apiError instanceof Error ? apiError.message : "Could not run report", "error");
+    } finally {
+      setIsRunning(false);
     }
   }
 
   return (
     <>
+      <ToastViewport dismissToast={dismissToast} toasts={toasts} />
       <Breadcrumbs items={[{ label: "Reports" }]} />
       <header className="page-header">
         <div>
@@ -46,7 +55,9 @@ export default function ReportPage() {
               To
               <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
             </label>
-            <button type="submit">Run report</button>
+            <LoadingButton type="submit" loading={isRunning}>
+              Run report
+            </LoadingButton>
           </form>
           {error ? <div className="message error">{error}</div> : null}
           {summary ? (

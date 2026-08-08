@@ -111,7 +111,7 @@ export async function findDocumentForUser(id: string, userId: string): Promise<D
   return db.documents.find((document) => document.id === id && document.userId === userId) ?? null;
 }
 
-export async function updateDocumentMetadata(id: string, userId: string, payload: { title: string; customer: string; issueDate: string }): Promise<DocumentRecord> {
+export async function updateDocumentMetadata(id: string, userId: string, payload: { title: string; description: string; customer: string; issueDate: string }): Promise<DocumentRecord> {
   const document = await findMutableDocument(id, userId);
   const updatedAt = new Date().toISOString();
 
@@ -122,6 +122,7 @@ export async function updateDocumentMetadata(id: string, userId: string, payload
       {
         $set: {
           title: payload.title,
+          description: payload.description,
           customer: payload.customer,
           issueDate: payload.issueDate,
           updatedAt
@@ -132,6 +133,7 @@ export async function updateDocumentMetadata(id: string, userId: string, payload
   }
 
   document.title = payload.title;
+  document.description = payload.description;
   document.customer = payload.customer;
   document.issueDate = payload.issueDate;
   document.updatedAt = updatedAt;
@@ -255,6 +257,7 @@ export async function duplicateDocument(id: string, userId: string): Promise<Doc
   const created: DocumentRecord = {
     ...source,
     id: crypto.randomUUID(),
+    description: source.description ?? "",
     title: `${source.title} (copy)`,
     status: "draft",
     createdAt: now,

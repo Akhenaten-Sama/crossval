@@ -1,6 +1,7 @@
 export type ApiDocument = {
   id: string;
   title: string;
+  description: string;
   customer: string;
   issueDate: string;
   status: "draft" | "finalized";

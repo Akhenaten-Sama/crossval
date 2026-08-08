@@ -76,6 +76,7 @@ function documentWithLines(lines: LineItemInput[]): DocumentRecord {
     id: "doc_1",
     userId: "user_1",
     title: "Sample",
+    description: "",
     customer: "Acme",
     issueDate: "2026-08-08",
     status: "draft",

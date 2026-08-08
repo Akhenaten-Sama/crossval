@@ -53,6 +53,10 @@ button,
   white-space: nowrap;
 }
 
+button {
+  gap: 8px;
+}
+
 button:hover,
 .button-link:hover {
   background: var(--accent-dark);
@@ -78,6 +82,53 @@ button:disabled {
   opacity: 0.55;
 }
 
+.button-spinner {
+  animation: spin 0.75s linear infinite;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+}
+
+.toast-viewport {
+  display: grid;
+  gap: 10px;
+  position: fixed;
+  right: 22px;
+  top: 22px;
+  width: min(380px, calc(100vw - 44px));
+  z-index: 80;
+}
+
+.toast {
+  background: white;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 18px 50px rgb(16 24 40 / 0.16);
+  color: var(--foreground);
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 13px 14px;
+  text-align: left;
+  white-space: normal;
+}
+
+.toast:hover {
+  background: white;
+}
+
+.toast-error {
+  border-left-color: var(--danger);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 button.auth-tab,
 button.auth-tab:hover {
   background: transparent;
@@ -89,7 +140,8 @@ button.auth-tab:hover {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   min-height: 38px;
   border: 1px solid var(--border);
@@ -97,6 +149,11 @@ select {
   background: white;
   color: var(--foreground);
   padding: 8px 10px;
+}
+
+textarea {
+  min-height: 92px;
+  resize: vertical;
 }
 
 label {
@@ -334,7 +391,7 @@ p {
   border-top: 1px solid var(--border);
   display: grid;
   gap: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 16px;
   padding-top: 16px;
 }
@@ -553,6 +610,8 @@ p {
 }
 
 .scroll-table-wrap {
+  --frozen-left-width: 220px;
+  --frozen-right-width: 188px;
   max-width: 100%;
 }
 
@@ -569,12 +628,12 @@ p {
 
 .frozen-table-wrap::before {
   background: linear-gradient(180deg, transparent, rgb(148 163 184 / 0.75) 12%, rgb(148 163 184 / 0.75) 88%, transparent);
-  left: 220px;
+  left: var(--frozen-left-width);
 }
 
 .frozen-table-wrap::after {
   background: linear-gradient(180deg, transparent, rgb(148 163 184 / 0.55) 12%, rgb(148 163 184 / 0.55) 88%, transparent);
-  right: 188px;
+  right: var(--frozen-right-width);
 }
 
 .frozen-table {
@@ -584,14 +643,14 @@ p {
 .frozen-table th:first-child,
 .frozen-table td:first-child {
   left: 0;
-  min-width: 220px;
+  min-width: var(--frozen-left-width);
   position: sticky;
   z-index: 2;
 }
 
 .frozen-table th:last-child,
 .frozen-table td:last-child {
-  min-width: 188px;
+  min-width: var(--frozen-right-width);
   position: sticky;
   right: 0;
   z-index: 2;
@@ -606,12 +665,30 @@ p {
   min-width: 1100px;
 }
 
+.line-items-table-wrap {
+  --frozen-right-width: 232px;
+}
+
+.line-items-table .action-column {
+  box-sizing: border-box;
+  max-width: var(--frozen-right-width);
+  min-width: var(--frozen-right-width);
+  overflow: hidden;
+  text-align: right;
+  width: var(--frozen-right-width);
+}
+
 .table-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 6px;
-  justify-content: flex-end;
-  max-width: 156px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.table-actions button {
+  min-width: 0;
+  padding: 0 8px;
+  width: 100%;
 }
 
 .empty-state {
@@ -861,6 +938,10 @@ p {
   grid-template-columns: 1.5fr 1fr 0.8fr 0.8fr 0.8fr;
   padding: 15px 16px;
   border-bottom: 1px solid var(--border);
+}
+
+.document-list-skeleton-row {
+  grid-template-columns: 1.3fr 1.4fr 1fr 0.8fr 0.7fr 0.8fr;
 }
 
 .skeleton-row:last-child {

@@ -33,6 +33,7 @@ function makeDocument(status: "draft" | "finalized", userId = "user_1", issueDat
     id: crypto.randomUUID(),
     userId,
     title: "Document",
+    description: "",
     customer: "Customer",
     issueDate,
     status,

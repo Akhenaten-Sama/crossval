@@ -5,9 +5,11 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "@/components/app/api-client";
 import Breadcrumbs from "@/components/app/breadcrumbs";
+import LoadingButton from "@/components/app/loading-button";
 import { money } from "@/components/app/format";
 import { DocumentDetailSkeleton } from "@/components/app/skeletons";
 import Totals from "@/components/app/totals";
+import { ToastViewport, useToasts } from "@/components/app/toasts";
 import type { ApiDocument } from "@/components/app/types";
 
 type LineItem = ApiDocument["lineItems"][number];
@@ -15,12 +17,13 @@ type LineItem = ApiDocument["lineItems"][number];
 export default function DocumentDetailPage({ id }: { id: string }) {
   const router = useRouter();
   const [document, setDocument] = useState<ApiDocument | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [discountBasis, setDiscountBasis] = useState<"percent" | "fixed">("percent");
   const [editingLine, setEditingLine] = useState<LineItem | null>(null);
   const [isLineModalOpen, setIsLineModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const { dismissToast, showToast, toasts } = useToasts();
 
   const totalsByLineId = useMemo(() => new Map(document?.totals.lines.map((line) => [line.id, line.totals]) ?? []), [document]);
 
@@ -55,21 +58,24 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       return;
     }
     setError(null);
-    setMessage(null);
+    setPendingAction("metadata");
     const form = new FormData(event.currentTarget);
     try {
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}`, {
         method: "PUT",
         body: JSON.stringify({
           title: form.get("title"),
+          description: form.get("description"),
           customer: form.get("customer"),
           issueDate: form.get("issueDate")
         })
       });
       setDocument(body.document);
-      setMessage("Document details saved.");
+      showToast("Document details saved.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not update document");
+      showToast(apiError instanceof Error ? apiError.message : "Could not update document", "error");
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -78,7 +84,6 @@ export default function DocumentDetailPage({ id }: { id: string }) {
     setDiscountBasis(line?.discount?.type === "fixed" ? "fixed" : "percent");
     setIsLineModalOpen(true);
     setError(null);
-    setMessage(null);
   }
 
   function closeLineModal() {
@@ -92,7 +97,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       return;
     }
     setError(null);
-    setMessage(null);
+    setPendingAction("line");
     const form = new FormData(event.currentTarget);
     const discountValue = form.get("discountValue") ? Number(form.get("discountValue")) : null;
     const discountType = discountValue === null ? "none" : discountBasis;
@@ -114,9 +119,11 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       setDocument(body.document);
       event.currentTarget.reset();
       closeLineModal();
-      setMessage(editingLine ? "Line item updated." : "Line item added.");
+      showToast(editingLine ? "Line item updated." : "Line item added.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not save line item");
+      showToast(apiError instanceof Error ? apiError.message : "Could not save line item", "error");
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -125,15 +132,17 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       return;
     }
     setError(null);
-    setMessage(null);
+    setPendingAction(`remove-${lineItemId}`);
     try {
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}/line-items?lineItemId=${lineItemId}`, {
         method: "DELETE"
       });
       setDocument(body.document);
-      setMessage("Line item removed.");
+      showToast("Line item removed.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not remove line item");
+      showToast(apiError instanceof Error ? apiError.message : "Could not remove line item", "error");
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -142,13 +151,15 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       return;
     }
     setError(null);
-    setMessage(null);
+    setPendingAction("finalize");
     try {
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}/finalize`, { method: "POST" });
       setDocument(body.document);
-      setMessage("Document finalized.");
+      showToast("Document finalized.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not finalize document");
+      showToast(apiError instanceof Error ? apiError.message : "Could not finalize document", "error");
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -157,12 +168,13 @@ export default function DocumentDetailPage({ id }: { id: string }) {
       return;
     }
     setError(null);
-    setMessage(null);
+    setPendingAction("duplicate");
     try {
       const body = await callApi<{ document: ApiDocument }>(`/api/documents/${document.id}/duplicate`, { method: "POST" });
       router.push(`/documents/${body.document.id}`);
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not duplicate document");
+      showToast(apiError instanceof Error ? apiError.message : "Could not duplicate document", "error");
+      setPendingAction(null);
     }
   }
 
@@ -172,6 +184,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
 
   return (
     <>
+      <ToastViewport dismissToast={dismissToast} toasts={toasts} />
       <Breadcrumbs items={[{ label: "Documents", href: "/documents" }, { label: document?.title ?? "Document" }]} />
       <header className="page-header">
         <div>
@@ -183,17 +196,16 @@ export default function DocumentDetailPage({ id }: { id: string }) {
           <Link className="button-link secondary-link" href="/documents">
             Back to documents
           </Link>
-          <button type="button" onClick={duplicateDocument} disabled={!document}>
+          <LoadingButton type="button" onClick={duplicateDocument} disabled={!document} loading={pendingAction === "duplicate"}>
             Duplicate
-          </button>
-          <button type="button" onClick={finalizeDocument} disabled={!document || document.status === "finalized"}>
+          </LoadingButton>
+          <LoadingButton type="button" onClick={finalizeDocument} disabled={!document || document.status === "finalized"} loading={pendingAction === "finalize"}>
             Finalize
-          </button>
+          </LoadingButton>
         </div>
       </header>
 
       {error ? <div className="message error">{error}</div> : null}
-      {message ? <div className="message success">{message}</div> : null}
       {document ? (
         <div className="document-workspace">
           <section className="panel document-overview-panel">
@@ -209,6 +221,10 @@ export default function DocumentDetailPage({ id }: { id: string }) {
               <div>
                 <span>Customer</span>
                 <strong>{document.customer}</strong>
+              </div>
+              <div>
+                <span>Description</span>
+                <strong>{document.description || "—"}</strong>
               </div>
               <div>
                 <span>Issue date</span>
@@ -228,9 +244,9 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                   <h2>Document details</h2>
                   <p className="muted">Draft metadata remains editable until the document is finalized.</p>
                 </div>
-                <button type="submit" disabled={document.status === "finalized"}>
+                <LoadingButton type="submit" disabled={document.status === "finalized"} loading={pendingAction === "metadata"}>
                   Save details
-                </button>
+                </LoadingButton>
               </div>
               <div className="field-row">
                 <label>
@@ -246,6 +262,10 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                   <input name="issueDate" type="date" required defaultValue={document.issueDate} disabled={document.status === "finalized"} />
                 </label>
               </div>
+              <label>
+                Description
+                <textarea name="description" maxLength={500} defaultValue={document.description ?? ""} disabled={document.status === "finalized"} />
+              </label>
             </form>
           </section>
 
@@ -255,11 +275,11 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                 <h2>Line items</h2>
                 <p className="muted">Add, edit, and remove billable rows while this document is in draft.</p>
               </div>
-              <button type="button" onClick={() => openLineModal()} disabled={document.status === "finalized"}>
+              <LoadingButton type="button" onClick={() => openLineModal()} disabled={document.status === "finalized"}>
                 Add line
-              </button>
+              </LoadingButton>
             </div>
-            <div className="table-wrap scroll-table-wrap frozen-table-wrap">
+            <div className="table-wrap scroll-table-wrap frozen-table-wrap line-items-table-wrap">
               <table className="data-table frozen-table line-items-table">
                 <thead>
                   <tr>
@@ -269,7 +289,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                     <th>Discount</th>
                     <th>Tax</th>
                     <th>Total</th>
-                    <th>Actions</th>
+                    <th className="action-column">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -283,14 +303,14 @@ export default function DocumentDetailPage({ id }: { id: string }) {
                         <td>{totals ? money(totals.discountCents) : "$0.00"}</td>
                         <td>{totals ? money(totals.taxCents) : "$0.00"}</td>
                         <td className="amount">{totals ? money(totals.totalCents) : "$0.00"}</td>
-                        <td>
+                        <td className="action-column">
                           <div className="table-actions">
-                            <button type="button" className="secondary compact" disabled={document.status === "finalized"} onClick={() => openLineModal(line)}>
+                            <LoadingButton type="button" className="secondary compact" disabled={document.status === "finalized"} onClick={() => openLineModal(line)}>
                               Edit
-                            </button>
-                            <button type="button" className="danger compact" disabled={document.status === "finalized"} onClick={() => removeLineItem(line.id)}>
+                            </LoadingButton>
+                            <LoadingButton type="button" className="danger compact" disabled={document.status === "finalized"} onClick={() => removeLineItem(line.id)} loading={pendingAction === `remove-${line.id}`}>
                               Remove
-                            </button>
+                            </LoadingButton>
                           </div>
                         </td>
                       </tr>
@@ -320,6 +340,7 @@ export default function DocumentDetailPage({ id }: { id: string }) {
           onBasisChange={setDiscountBasis}
           onClose={closeLineModal}
           onSubmit={submitLineItem}
+          saving={pendingAction === "line"}
         />
       ) : null}
     </>
@@ -331,13 +352,15 @@ function LineItemModal({
   line,
   onBasisChange,
   onClose,
-  onSubmit
+  onSubmit,
+  saving
 }: {
   discountBasis: "percent" | "fixed";
   line: LineItem | null;
   onBasisChange: (basis: "percent" | "fixed") => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  saving: boolean;
 }) {
   const discountValue = line?.discount?.type === "percent" ? line.discount.value : line?.discount?.type === "fixed" ? line.discount.amountCents / 100 : "";
 
@@ -399,10 +422,12 @@ function LineItemModal({
             </div>
           </div>
           <div className="modal-actions">
-            <button type="button" className="secondary" onClick={onClose}>
+            <button type="button" className="secondary" onClick={onClose} disabled={saving}>
               Cancel
             </button>
-            <button type="submit">{line ? "Save changes" : "Add line"}</button>
+            <LoadingButton type="submit" loading={saving}>
+              {line ? "Save changes" : "Add line"}
+            </LoadingButton>
           </div>
         </form>
       </section>

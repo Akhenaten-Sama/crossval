@@ -7,13 +7,14 @@ export function DocumentListSkeleton() {
       </div>
       <div className="skeleton-table">
         {Array.from({ length: 6 }).map((_, index) => (
-          <div className="skeleton-row" key={index}>
-            <div className="skeleton-block" />
-            <div className="skeleton-block" />
-            <div className="skeleton-block" />
-            <div className="skeleton-block" />
-            <div className="skeleton-block" />
-          </div>
+            <div className="skeleton-row document-list-skeleton-row" key={index}>
+              <div className="skeleton-block" />
+              <div className="skeleton-block" />
+              <div className="skeleton-block" />
+              <div className="skeleton-block" />
+              <div className="skeleton-block" />
+              <div className="skeleton-block" />
+            </div>
         ))}
       </div>
     </section>
@@ -54,7 +55,7 @@ export function DocumentDetailSkeleton() {
             ))}
           </div>
           <div className="document-facts">
-            {Array.from({ length: 3 }).map((_, index) => (
+            {Array.from({ length: 4 }).map((_, index) => (
               <div key={index}>
                 <div className="skeleton-block skeleton-label" />
                 <div className="skeleton-block skeleton-copy short" />

@@ -21,6 +21,7 @@ export function serializeDocument(document: DocumentRecord) {
 
   return {
     ...document,
+    description: document.description ?? "",
     totals,
     displayTotals: {
       subtotal: formatMoney(totals.subtotalCents),

@@ -4,16 +4,18 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "./breadcrumbs";
 import { callApi } from "./api-client";
+import LoadingButton from "./loading-button";
+import { ToastViewport, useToasts } from "./toasts";
 
 export default function AccountPage({ email }: { email: string }) {
   const router = useRouter();
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { dismissToast, showToast, toasts } = useToasts();
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(null);
-    setError(null);
+    setIsChangingPassword(true);
 
     const form = new FormData(event.currentTarget);
     try {
@@ -25,20 +27,29 @@ export default function AccountPage({ email }: { email: string }) {
         })
       });
       event.currentTarget.reset();
-      setMessage("Password updated.");
+      showToast("Password updated.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not update password");
+      showToast(apiError instanceof Error ? apiError.message : "Could not update password", "error");
+    } finally {
+      setIsChangingPassword(false);
     }
   }
 
   async function logout() {
-    await callApi("/api/auth/logout", { method: "POST" });
-    router.push("/auth");
-    router.refresh();
+    setIsLoggingOut(true);
+    try {
+      await callApi("/api/auth/logout", { method: "POST" });
+      router.push("/auth");
+      router.refresh();
+    } catch (apiError) {
+      showToast(apiError instanceof Error ? apiError.message : "Could not log out", "error");
+      setIsLoggingOut(false);
+    }
   }
 
   return (
     <>
+      <ToastViewport dismissToast={dismissToast} toasts={toasts} />
       <Breadcrumbs items={[{ label: "Account" }]} />
       <header className="page-header">
         <div>
@@ -46,16 +57,14 @@ export default function AccountPage({ email }: { email: string }) {
           <h1>Workspace security</h1>
           <p>Manage your login credentials for this pricing workspace.</p>
         </div>
-        <button type="button" className="secondary" onClick={logout}>
+        <LoadingButton type="button" className="secondary" onClick={logout} loading={isLoggingOut}>
           Log out
-        </button>
+        </LoadingButton>
       </header>
 
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <form className="panel form-grid content-panel" onSubmit={changePassword}>
           <h2>Change password</h2>
-          {error ? <div className="message error">{error}</div> : null}
-          {message ? <div className="message success">{message}</div> : null}
           <div className="field-row">
             <label>
               Current password
@@ -66,7 +75,9 @@ export default function AccountPage({ email }: { email: string }) {
               <input name="newPassword" type="password" minLength={8} required />
             </label>
           </div>
-          <button type="submit">Update password</button>
+          <LoadingButton type="submit" loading={isChangingPassword}>
+            Update password
+          </LoadingButton>
         </form>
 
         <aside className="panel">

@@ -22,6 +22,7 @@ export type DocumentRecord = {
   id: string;
   userId: string;
   title: string;
+  description: string;
   customer: string;
   issueDate: string;
   status: DocumentStatus;

@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { callApi } from "./api-client";
+import LoadingButton from "./loading-button";
+import { ToastViewport, useToasts } from "./toasts";
 
 export default function AuthPage() {
   const router = useRouter();
   const [email, setEmail] = useState("demo@example.com");
   const [password, setPassword] = useState("password123");
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { dismissToast, showToast, toasts } = useToasts();
 
   async function submit() {
-    setError(null);
     setLoading(true);
     try {
       await callApi(`/api/auth/${mode}`, {
@@ -23,7 +24,7 @@ export default function AuthPage() {
       router.push("/documents");
       router.refresh();
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Authentication failed");
+      showToast(apiError instanceof Error ? apiError.message : "Authentication failed", "error");
     } finally {
       setLoading(false);
     }
@@ -31,6 +32,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_34%),linear-gradient(135deg,#f8fafc_0%,#eef2f7_45%,#e6f4f1_100%)] px-6 py-10 text-slate-950">
+      <ToastViewport dismissToast={dismissToast} toasts={toasts} />
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden lg:block">
           <div className="mb-8 inline-flex rounded-full border border-teal-200 bg-white/70 px-4 py-2 text-sm font-semibold text-teal-800 shadow-sm">
@@ -90,8 +92,6 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {error ? <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
-
           <div className="grid gap-4">
             <label className="grid gap-2 text-sm font-bold text-slate-700">
               Email
@@ -110,14 +110,14 @@ export default function AuthPage() {
                 onChange={(event) => setPassword(event.target.value)}
               />
             </label>
-            <button
+            <LoadingButton
               type="button"
               className="mt-2 h-12 rounded-lg bg-teal-700 text-sm font-black text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60"
               onClick={submit}
-              disabled={loading}
+              loading={loading}
             >
-              {loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}
-            </button>
+              {mode === "login" ? "Log in" : "Create account"}
+            </LoadingButton>
           </div>
         </section>
       </div>

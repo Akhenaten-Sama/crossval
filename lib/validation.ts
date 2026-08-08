@@ -13,6 +13,7 @@ export class ValidationError extends Error {
 
 export const documentPayloadSchema = z.object({
   title: z.string().trim().min(1, "title is required"),
+  description: z.string().trim().max(500, "description must be 500 characters or fewer").optional().default(""),
   customer: z.string().trim().min(1, "customer is required"),
   issueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "issueDate must be YYYY-MM-DD")
 });

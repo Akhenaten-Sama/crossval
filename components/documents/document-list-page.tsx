@@ -4,24 +4,30 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { callApi } from "@/components/app/api-client";
 import Breadcrumbs from "@/components/app/breadcrumbs";
+import LoadingButton from "@/components/app/loading-button";
 import { DocumentListSkeleton } from "@/components/app/skeletons";
+import { ToastViewport, useToasts } from "@/components/app/toasts";
 import type { ApiDocument } from "@/components/app/types";
 
 export default function DocumentListPage() {
   const [documents, setDocuments] = useState<ApiDocument[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { dismissToast, showToast, toasts } = useToasts();
 
   async function loadDocuments() {
-    setLoading(true);
+    setIsRefreshing(true);
     setError(null);
     try {
       const body = await callApi<{ documents: ApiDocument[] }>("/api/documents");
       setDocuments(body.documents);
+      showToast("Documents refreshed.");
     } catch (apiError) {
-      setError(apiError instanceof Error ? apiError.message : "Could not load documents");
+      showToast(apiError instanceof Error ? apiError.message : "Could not load documents", "error");
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   }
 
@@ -52,6 +58,7 @@ export default function DocumentListPage() {
 
   return (
     <>
+      <ToastViewport dismissToast={dismissToast} toasts={toasts} />
       <Breadcrumbs items={[{ label: "Documents" }]} />
       <header className="page-header">
         <div>
@@ -70,9 +77,9 @@ export default function DocumentListPage() {
         <section className="panel content-panel">
           <div className="section-heading">
             <h2>All documents</h2>
-            <button type="button" className="secondary" onClick={loadDocuments}>
+            <LoadingButton type="button" className="secondary" onClick={loadDocuments} loading={isRefreshing}>
               Refresh
-            </button>
+            </LoadingButton>
           </div>
           {error ? <div className="message error">{error}</div> : null}
           {documents.length === 0 ? <EmptyState /> : null}
@@ -82,6 +89,7 @@ export default function DocumentListPage() {
                 <thead>
                   <tr>
                     <th>Title</th>
+                    <th>Description</th>
                     <th>Customer</th>
                     <th>Issue date</th>
                     <th>Status</th>
@@ -94,6 +102,7 @@ export default function DocumentListPage() {
                       <td>
                         <Link href={`/documents/${document.id}`}>{document.title}</Link>
                       </td>
+                      <td>{document.description || "—"}</td>
                       <td>{document.customer}</td>
                       <td>{document.issueDate}</td>
                       <td>
