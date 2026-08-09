@@ -10,10 +10,16 @@ export default function AppShell({ children }: Readonly<{ children: React.ReactN
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  function closeMenu() {
+    setIsMenuOpen(false);
+  }
 
   async function logout() {
     setIsLoggingOut(true);
     try {
+      closeMenu();
       await callApi("/api/auth/logout", { method: "POST" });
       router.push("/auth");
       router.refresh();
@@ -28,22 +34,35 @@ export default function AppShell({ children }: Readonly<{ children: React.ReactN
 
   return (
     <div className="app-frame">
-      <aside className="sidebar">
-        <Link className="brand" href="/">
+      <aside className={`sidebar ${isMenuOpen ? "menu-open" : ""}`}>
+        <Link className="brand" href="/" onClick={closeMenu}>
           <span>MR</span>
           <strong>Multi-Rate</strong>
         </Link>
-        <Link className="sidebar-action" href="/documents/new">
-          New Document
-        </Link>
-        <nav className="nav-list" aria-label="Primary navigation">
-          <Link href="/documents">Documents</Link>
-          <Link href="/reports">Reports</Link>
-          <Link href="/account">Account</Link>
-        </nav>
-        <LoadingButton type="button" className="sidebar-logout" onClick={logout} loading={isLoggingOut}>
-          Log out
-        </LoadingButton>
+        <button type="button" className="menu-toggle" aria-controls="primary-navigation" aria-expanded={isMenuOpen} aria-label="Toggle navigation menu" onClick={() => setIsMenuOpen((open) => !open)}>
+          <span />
+          <span />
+          <span />
+        </button>
+        <div className="sidebar-menu" id="primary-navigation">
+          <Link className="sidebar-action" href="/documents/new" onClick={closeMenu}>
+            New Document
+          </Link>
+          <nav className="nav-list" aria-label="Primary navigation">
+            <Link href="/documents" onClick={closeMenu}>
+              Documents
+            </Link>
+            <Link href="/reports" onClick={closeMenu}>
+              Reports
+            </Link>
+            <Link href="/account" onClick={closeMenu}>
+              Account
+            </Link>
+          </nav>
+          <LoadingButton type="button" className="sidebar-logout" onClick={logout} loading={isLoggingOut}>
+            Log out
+          </LoadingButton>
+        </div>
       </aside>
       <div className="main-frame">{children}</div>
     </div>

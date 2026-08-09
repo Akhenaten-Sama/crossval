@@ -224,7 +224,7 @@ npm test
 
 The UI is built around shared responsive layout contracts:
 
-- `AppShell` changes from a fixed desktop sidebar to a compact sticky top navigation below `980px`.
+- `AppShell` changes from a fixed desktop sidebar to a sticky mobile header with an accessible hamburger menu below `980px`.
 - Page headers remain visible, then compress text/actions into a single-column layout below `720px`.
 - Forms use `.field-row` grids on desktop and collapse to one column on mobile.
 - Totals and document fact cards move from four columns to two columns on tablets and one column on phones.
