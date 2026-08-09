@@ -2,6 +2,10 @@
 
 A small Next.js application for creating customer documents with line items, per-line discounts, tax, draft/finalized lifecycle rules, and date-range summary reporting.
 
+## Live Demo
+
+**Live Vercel App:** [https://test-app-six-xi.vercel.app](https://test-app-six-xi.vercel.app)
+
 ## Tech Stack
 
 - Next.js App Router
