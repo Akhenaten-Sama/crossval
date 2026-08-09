@@ -44,6 +44,7 @@ export default function AppShell({ children }: Readonly<{ children: React.ReactN
           <span />
           <span />
         </button>
+        <button type="button" className="menu-backdrop" aria-label="Close navigation menu" onClick={closeMenu} />
         <div className="sidebar-menu" id="primary-navigation">
           <Link className="sidebar-action" href="/documents/new" onClick={closeMenu}>
             New Document
