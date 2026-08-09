@@ -5,11 +5,21 @@ import { createDocument, listDocumentsByUser } from "@/lib/repository";
 import type { DocumentRecord, LineItem, LineItemInput } from "@/lib/types";
 import { documentPayloadSchema, getZodMessage, parseLineItemPayload } from "@/lib/validation";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const user = await requireUser();
     const documents = (await listDocumentsByUser(user.id)).map(serializeDocument);
-    return NextResponse.json({ documents });
+    return NextResponse.json(
+      { documents },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate"
+        }
+      }
+    );
   } catch (error) {
     return routeError(error);
   }
