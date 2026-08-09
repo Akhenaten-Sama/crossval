@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type KeyboardEvent, useEffect, useState } from "react";
 import { callApi } from "@/components/app/api-client";
 import Breadcrumbs from "@/components/app/breadcrumbs";
 import LoadingButton from "@/components/app/loading-button";
@@ -10,6 +11,7 @@ import { ToastViewport, useToasts } from "@/components/app/toasts";
 import type { ApiDocument } from "@/components/app/types";
 
 export default function DocumentListPage() {
+  const router = useRouter();
   const [documents, setDocuments] = useState<ApiDocument[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,6 +58,17 @@ export default function DocumentListPage() {
     };
   }, []);
 
+  function openDocument(id: string) {
+    router.push(`/documents/${id}`);
+  }
+
+  function handleDocumentRowKeyDown(event: KeyboardEvent<HTMLTableRowElement>, id: string) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openDocument(id);
+    }
+  }
+
   return (
     <>
       <ToastViewport dismissToast={dismissToast} toasts={toasts} />
@@ -95,9 +108,16 @@ export default function DocumentListPage() {
                 </thead>
                 <tbody>
                   {documents.map((document) => (
-                    <tr key={document.id}>
+                    <tr
+                      className="clickable-row"
+                      key={document.id}
+                      onClick={() => openDocument(document.id)}
+                      onKeyDown={(event) => handleDocumentRowKeyDown(event, document.id)}
+                      role="link"
+                      tabIndex={0}
+                    >
                       <td>
-                        <Link href={`/documents/${document.id}`}>{document.title}</Link>
+                        <span className="row-link-text">{document.title}</span>
                       </td>
                       <td>{document.description || "—"}</td>
                       <td>{document.customer}</td>

@@ -8,8 +8,8 @@ import { ToastViewport, useToasts } from "./toasts";
 
 export default function AuthPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("demo@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
   const { dismissToast, showToast, toasts } = useToasts();
@@ -97,6 +97,7 @@ export default function AuthPage() {
               Email
               <input
                 className="auth-input h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
               />
@@ -105,6 +106,7 @@ export default function AuthPage() {
               Password
               <input
                 className="auth-input h-12 rounded-lg border border-slate-300 bg-white px-4 text-slate-950 outline-none transition focus:border-teal-600 focus:ring-4 focus:ring-teal-100"
+                placeholder="Enter your password"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}

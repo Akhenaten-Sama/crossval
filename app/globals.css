@@ -707,7 +707,22 @@ p {
   background: #fafcff;
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:focus-visible td {
+  background: #f0fdfa;
+  outline: 2px solid rgb(20 184 166 / 0.45);
+  outline-offset: -2px;
+}
+
 .data-table a {
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.row-link-text {
   color: var(--accent-dark);
   font-weight: 800;
 }

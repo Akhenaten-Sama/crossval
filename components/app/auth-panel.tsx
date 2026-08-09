@@ -4,8 +4,8 @@ import { useState } from "react";
 import { callApi } from "./api-client";
 
 export default function AuthPanel({ onAuthenticated }: { onAuthenticated?: () => void }) {
-  const [email, setEmail] = useState("demo@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,11 +35,11 @@ export default function AuthPanel({ onAuthenticated }: { onAuthenticated?: () =>
       <div className="form-grid">
         <label>
           Email
-          <input value={email} onChange={(event) => setEmail(event.target.value)} />
+          <input placeholder="you@example.com" value={email} onChange={(event) => setEmail(event.target.value)} />
         </label>
         <label>
           Password
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          <input placeholder="Enter your password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
         </label>
         <div className="actions">
           <button type="button" onClick={() => authenticate("login")}>

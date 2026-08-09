@@ -58,6 +58,15 @@ npm run db:migrate
 
 Users sign up and log in with email and password at `/auth`. They can change their password at `/account`. Passwords are hashed with PBKDF2 and sessions are stored in a signed HTTP-only cookie.
 
+Reviewer/test account:
+
+```text
+Email: demo@example.com
+Password: password123
+```
+
+If the account is not present in a fresh database, use the sign-up tab with these credentials first.
+
 Unauthenticated users are restricted to `/auth`. The home page, document pages, and reports use server-side session checks and redirect to `/auth` before protected content renders.
 
 Every document query and mutation is scoped to the authenticated user. A user cannot read, edit, finalize, duplicate, delete, or report on another user's documents.
@@ -269,6 +278,7 @@ When deployed, add the live URL here and in the submission email:
 
 ```text
 Live URL: https://test-app-six-xi.vercel.app
+Test URL: https://test-app-six-xi.vercel.app
 ```
 
 ## Assumptions and Tradeoffs
