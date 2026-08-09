@@ -242,6 +242,19 @@ Mobile audit coverage:
 - `/reports`
 - `/account`
 
+## AI Report Extension Plan
+
+The report page is ready for an AI insight layer, but the current deployment intentionally keeps report totals deterministic and server-calculated. A production-safe AI addition would use:
+
+- `POST /api/reports/insights` to accept the selected date range and server-computed report summary.
+- A server-side prompt that only uses scoped report data for the authenticated user.
+- Structured JSON output such as `{ summary, risks, opportunities, suggestedActions }`.
+- A cached insight record keyed by `userId + from + to + summary totals` to avoid repeated AI spend.
+- A dashboard section that renders AI narrative, variance explanations, and recommended follow-up questions.
+- Optional charts fed by deterministic API data, with AI explaining trends rather than calculating totals.
+
+Do not let AI become the source of truth for money. AI should explain and summarize server-computed numbers only.
+
 ## Deployment
 
 This repository is deployed on Vercel. Configure these production environment variables for future deployments:
